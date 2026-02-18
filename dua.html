@@ -175,6 +175,7 @@
     .suggestion.disabled {
       opacity: 0.3;
       cursor: not-allowed;
+      pointer-events: none;
     }
 
     .chip-hint {
@@ -857,6 +858,9 @@
     let selectedChips = [];
 
     function toggleSuggestion(el, topic) {
+      // Block if disabled
+      if (el.classList.contains('disabled')) return;
+
       const isSelected = el.classList.contains('selected');
       const hint = document.getElementById('chip-hint');
 
@@ -864,10 +868,14 @@
         // Deselect
         el.classList.remove('selected');
         selectedChips = selectedChips.filter(t => t !== topic);
-        // Re-enable all disabled chips
-        document.querySelectorAll('.suggestion.disabled').forEach(s => s.classList.remove('disabled'));
+        // Re-enable all chips (will re-disable if still at max)
+        document.querySelectorAll('.suggestion').forEach(s => s.classList.remove('disabled'));
+        // If still 3 selected somehow, re-disable unselected
+        if (selectedChips.length >= MAX_CHIPS) {
+          document.querySelectorAll('.suggestion:not(.selected)').forEach(s => s.classList.add('disabled'));
+        }
         hint.textContent = selectedChips.length > 0
-          ? `${selectedChips.length}/3 selected — tap to deselect`
+          ? `${selectedChips.length}/3 selected — tap again to remove`
           : 'Select up to 3 topics, or type your own above';
         hint.classList.remove('limit');
       } else {
@@ -875,9 +883,8 @@
         el.classList.add('selected');
         selectedChips.push(topic);
         if (selectedChips.length === MAX_CHIPS) {
-          // Disable unselected chips
           document.querySelectorAll('.suggestion:not(.selected)').forEach(s => s.classList.add('disabled'));
-          hint.textContent = 'Maximum 3 selected ✓';
+          hint.textContent = 'Maximum 3 selected ✓ — tap a chip to remove it';
           hint.classList.add('limit');
         } else {
           hint.textContent = `${selectedChips.length}/3 selected`;
