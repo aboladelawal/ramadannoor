@@ -156,13 +156,12 @@
     <div id="location-prompt" class="location-prompt">
       <div class="loc-icon">📍</div>
       <div class="loc-title">Where are you fasting?</div>
-      <div class="loc-sub">We'll calculate your exact Suhoor and Iftar times.<br>Your location is never stored or shared.</div>
-      <button class="loc-btn" onclick="requestLocation()">Use My Location 📍</button>
-      <div class="loc-manual">or <a onclick="showCityInput()">enter your city manually</a></div>
-      <div class="city-input-wrap" id="city-input-wrap">
+      <div class="loc-sub">Enter your city for accurate Suhoor and Iftar times.<br>Saved automatically — only asked once.</div>
+      <div class="city-input-wrap" id="city-input-wrap" style="display:block;">
         <input id="city-input" type="text" placeholder="e.g. Lagos, London, Dubai..." onkeydown="if(event.key==='Enter') lookupCity()">
-        <button onclick="lookupCity()">Find My Times</button>
+        <button onclick="lookupCity()">Get My Times ✦</button>
       </div>
+      <div class="loc-manual" style="margin-top:14px;">or <a onclick="requestLocation()">use GPS automatically 📍</a></div>
     </div>
 
     <!-- Loading -->
@@ -277,23 +276,43 @@
     // ── Location ─────────────────────────────────────────────────
     function requestLocation() {
       document.getElementById('loading-msg').style.display = 'block';
+      document.getElementById('loading-msg').textContent = 'Getting your location...';
       document.getElementById('location-prompt').style.display = 'none';
+      document.getElementById('error-msg').style.display = 'none';
+
+      if (!navigator.geolocation) {
+        // Browser doesn't support geolocation
+        document.getElementById('loading-msg').style.display = 'none';
+        document.getElementById('location-prompt').style.display = 'block';
+        showCityInput();
+        return;
+      }
+
       navigator.geolocation.getCurrentPosition(
         async pos => {
+          document.getElementById('loading-msg').textContent = 'Fetching prayer times...';
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
           try {
             const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
             const d = await r.json();
-            userCity = [d.address.city || d.address.town || d.address.village, d.address.country].filter(Boolean).join(', ');
-          } catch { userCity = 'Your Location'; }
+            userCity = [d.address.city || d.address.town || d.address.village || d.address.county, d.address.country].filter(Boolean).join(', ') || 'Your Location';
+          } catch {
+            userCity = 'Your Location';
+          }
           await fetchTimes(lat, lng);
         },
-        () => {
+        (err) => {
+          // Permission denied or unavailable
           document.getElementById('loading-msg').style.display = 'none';
           document.getElementById('location-prompt').style.display = 'block';
+          document.getElementById('error-msg').style.display = 'block';
+          document.getElementById('error-msg').textContent = err.code === 1
+            ? 'Location permission denied. Enter your city below instead.'
+            : 'Could not get location. Enter your city below instead.';
           showCityInput();
-        }
+        },
+        { timeout: 10000, maximumAge: 60000, enableHighAccuracy: false }
       );
     }
 
@@ -325,16 +344,20 @@
 
     // ── Fetch from Aladhan API ────────────────────────────────────
     async function fetchTimes(lat, lng) {
+      document.getElementById('loading-msg').style.display = 'block';
+      document.getElementById('loading-msg').textContent = 'Fetching prayer times...';
       try {
         const today = new Date();
-        const dd = String(today.getDate()).padStart(2,'0');
-        const mm = String(today.getMonth()+1).padStart(2,'0');
+        const dd   = String(today.getDate()).padStart(2,'0');
+        const mm   = String(today.getMonth()+1).padStart(2,'0');
         const yyyy = today.getFullYear();
-        // Method 3 = Muslim World League. Works globally.
+        // Aladhan API — method 3 = Muslim World League, works globally
         const url = `https://api.aladhan.com/v1/timings/${dd}-${mm}-${yyyy}?latitude=${lat}&longitude=${lng}&method=3`;
         const r = await fetch(url);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
         const d = await r.json();
-        if (d.code !== 200) throw new Error('API error');
+        // Aladhan returns {status:"OK", code:200} or {status:"Error"}
+        if (d.status !== 'OK' && d.code !== 200) throw new Error('API returned error: ' + JSON.stringify(d));
 
         const t = d.data.timings;
         prayerData = {
@@ -346,24 +369,32 @@
           isha:    t.Isha,
         };
 
-        // Save
-        localStorage.setItem('noor_lat', lat);
-        localStorage.setItem('noor_lng', lng);
+        // Save everything to localStorage
+        localStorage.setItem('noor_lat',  lat);
+        localStorage.setItem('noor_lng',  lng);
         localStorage.setItem('noor_city', userCity);
-        localStorage.setItem('noor_prayer_cache', JSON.stringify({ date: `${dd}-${mm}-${yyyy}`, timings: prayerData }));
+        localStorage.setItem('noor_prayer_cache', JSON.stringify({
+          date: `${dd}-${mm}-${yyyy}`,
+          timings: prayerData
+        }));
 
         document.getElementById('loading-msg').style.display = 'none';
+        document.getElementById('error-msg').style.display   = 'none';
         renderMain();
+
       } catch(e) {
+        console.error('fetchTimes error:', e);
         document.getElementById('loading-msg').style.display = 'none';
-        // Only show location prompt if we don't have a saved location
-        if (!localStorage.getItem('noor_lat')) {
-          document.getElementById('error-msg').style.display = 'block';
-          document.getElementById('error-msg').innerHTML = 'Could not fetch prayer times. Check your connection and try again.';
-          document.getElementById('location-prompt').style.display = 'block';
+        const hasSaved = localStorage.getItem('noor_lat');
+        document.getElementById('error-msg').style.display = 'block';
+        if (hasSaved) {
+          document.getElementById('error-msg').innerHTML =
+            `Could not load today's times. <a onclick="fetchTimes(${lat}, ${lng})" style="color:var(--gold);cursor:pointer;text-decoration:underline;">Tap to retry</a>`;
         } else {
-          document.getElementById('error-msg').style.display = 'block';
-          document.getElementById('error-msg').innerHTML = `Could not fetch today's times. <a onclick="fetchTimes(${localStorage.getItem('noor_lat')}, ${localStorage.getItem('noor_lng')})" style="color:var(--gold);cursor:pointer;text-decoration:underline;">Retry</a>`;
+          document.getElementById('error-msg').innerHTML =
+            'Could not fetch prayer times. Check your connection, or enter your city manually.';
+          document.getElementById('location-prompt').style.display = 'block';
+          showCityInput();
         }
       }
     }
