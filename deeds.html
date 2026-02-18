@@ -471,9 +471,12 @@
           ${(isTod || (isPast && count > 0)) ? '<span class="cal-dot"></span>' : ''}
         </div>`;
       }).join('');
-      // Scroll to today
-      const todayEl = strip.children[today - 1];
-      if (todayEl) todayEl.scrollIntoView({ inline: 'center', behavior: 'smooth' });
+      // Scroll to today only on first load, not on every deed tap
+      if (!window._calendarScrolled) {
+        const todayEl = strip.children[today - 1];
+        if (todayEl) todayEl.scrollIntoView({ inline: 'center', behavior: 'smooth' });
+        window._calendarScrolled = true;
+      }
     }
 
     function clearTodayDeeds() {
