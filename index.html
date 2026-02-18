@@ -7,46 +7,28 @@
   <meta name="description" content="Ramadan Real Talk Bingo + Personal Dua Generator. Made for the Ummah. Ramadan 1447H.">
   <meta property="og:title" content="Noor 🌙 — Your Ramadan Companion">
   <meta property="og:description" content="Ramadan Real Talk Bingo + Personal Dua Generator. Made for Muslims, with love. Ramadan 1447H.">
-  <meta property="og:image" content="https://noor-seven-lac.vercel.app/og-noor.png">
+  <meta property="og:image" content="https://raw.githubusercontent.com/aboladelawal/noor/main/og-noor.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:url" content="https://noor-seven-lac.vercel.app">
+  <meta property="og:url" content="https://noor-seven-lac.vercel.app?ref=share">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Noor 🌙 — Your Ramadan Companion">
   <meta name="twitter:description" content="Ramadan Real Talk Bingo + Personal Dua Generator. Made for Muslims, with love.">
-  <meta name="twitter:image" content="https://noor-seven-lac.vercel.app/og-noor.png">
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/aboladelawal/noor/main/og-noor.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Tajawal:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0a0a0f;
-      --bg2: #0f0f1a;
-      --gold: #c9a84c;
-      --gold-light: #e8c97a;
-      --gold-dim: #7a6130;
-      --cream: #f5efe0;
-      --text: #e8dcc8;
-      --text-dim: #8a7d6a;
-      --glow: rgba(201, 168, 76, 0.15);
+      --bg: #0a0a0f; --bg2: #0f0f1a; --gold: #c9a84c; --gold-light: #e8c97a;
+      --gold-dim: #7a6130; --cream: #f5efe0; --text: #e8dcc8; --text-dim: #8a7d6a;
+      --glow: rgba(201,168,76,0.15);
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Tajawal', sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* Stars background */
+    body { background: var(--bg); color: var(--text); font-family: 'Tajawal', sans-serif; min-height: 100vh; overflow-x: hidden; }
     body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: 
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image:
         radial-gradient(1px 1px at 15% 20%, rgba(201,168,76,0.6) 0%, transparent 100%),
         radial-gradient(1px 1px at 85% 10%, rgba(201,168,76,0.4) 0%, transparent 100%),
         radial-gradient(1px 1px at 40% 80%, rgba(201,168,76,0.5) 0%, transparent 100%),
@@ -57,213 +39,39 @@
         radial-gradient(1px 1px at 10% 90%, rgba(201,168,76,0.4) 0%, transparent 100%),
         radial-gradient(1px 1px at 60% 15%, rgba(201,168,76,0.3) 0%, transparent 100%),
         radial-gradient(1.5px 1.5px at 35% 65%, rgba(201,168,76,0.5) 0%, transparent 100%);
-      pointer-events: none;
-      z-index: 0;
     }
-
-    .container {
-      position: relative;
-      z-index: 1;
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 0 24px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .moon-wrap {
-      position: relative;
-      margin-bottom: 8px;
-      animation: float 4s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-
-    .moon {
-      font-size: 64px;
-      filter: drop-shadow(0 0 20px rgba(201,168,76,0.6));
-    }
-
-    .app-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 72px;
-      font-weight: 300;
-      color: var(--gold-light);
-      letter-spacing: 8px;
-      text-align: center;
-      line-height: 1;
-      text-shadow: 0 0 40px rgba(201,168,76,0.4);
-    }
-
-    .app-name span {
-      font-style: italic;
-      font-weight: 300;
-    }
-
-    .arabic-sub {
-      font-family: 'Tajawal', sans-serif;
-      font-size: 18px;
-      color: var(--gold-dim);
-      letter-spacing: 3px;
-      text-align: center;
-      margin-top: 4px;
-      font-weight: 300;
-    }
-
-    .tagline {
-      font-size: 14px;
-      color: var(--text-dim);
-      text-align: center;
-      margin-top: 16px;
-      margin-bottom: 48px;
-      letter-spacing: 1px;
-      font-weight: 300;
-    }
-
-    .cards {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .card {
-      background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.03));
-      border: 1px solid rgba(201,168,76,0.2);
-      border-radius: 16px;
-      padding: 28px 24px;
-      text-decoration: none;
-      color: inherit;
-      display: block;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-    }
-
-    .card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(201,168,76,0.1), transparent);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .card:hover {
-      border-color: rgba(201,168,76,0.5);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(201,168,76,0.15);
-    }
-
+    .container { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 0 24px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .moon-wrap { position: relative; margin-bottom: 8px; animation: float 4s ease-in-out infinite; }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .moon { font-size: 64px; filter: drop-shadow(0 0 20px rgba(201,168,76,0.6)); }
+    .app-name { font-family: 'Cormorant Garamond', serif; font-size: 72px; font-weight: 300; color: var(--gold-light); letter-spacing: 8px; text-align: center; line-height: 1; text-shadow: 0 0 40px rgba(201,168,76,0.4); }
+    .app-name span { font-style: italic; }
+    .arabic-sub { font-family: 'Tajawal', sans-serif; font-size: 18px; color: var(--gold-dim); letter-spacing: 3px; text-align: center; margin-top: 4px; font-weight: 300; }
+    .tagline { font-size: 14px; color: var(--text-dim); text-align: center; margin-top: 16px; margin-bottom: 48px; letter-spacing: 1px; font-weight: 300; transition: all 0.4s; }
+    .cards { width: 100%; display: flex; flex-direction: column; gap: 16px; }
+    .card { background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.03)); border: 1px solid rgba(201,168,76,0.2); border-radius: 16px; padding: 28px 24px; text-decoration: none; color: inherit; display: block; transition: all 0.3s ease; position: relative; overflow: hidden; cursor: pointer; }
+    .card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(201,168,76,0.1), transparent); opacity: 0; transition: opacity 0.3s ease; }
+    .card:hover { border-color: rgba(201,168,76,0.5); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(201,168,76,0.15); }
     .card:hover::before { opacity: 1; }
-
-    .card-icon {
-      font-size: 36px;
-      margin-bottom: 12px;
-      display: block;
-    }
-
-    .card-label {
-      font-size: 11px;
-      letter-spacing: 3px;
-      color: var(--gold);
-      text-transform: uppercase;
-      font-weight: 500;
-      margin-bottom: 6px;
-    }
-
-    .card-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 28px;
-      font-weight: 400;
-      color: var(--cream);
-      margin-bottom: 8px;
-      line-height: 1.2;
-    }
-
-    .card-desc {
-      font-size: 13px;
-      color: var(--text-dim);
-      line-height: 1.6;
-      font-weight: 300;
-    }
-
-    .card-arrow {
-      position: absolute;
-      right: 24px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--gold-dim);
-      font-size: 20px;
-      transition: all 0.3s ease;
-    }
-
-    .card:hover .card-arrow {
-      color: var(--gold);
-      right: 20px;
-    }
-
-    .card-bingo {
-      background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(180,120,40,0.05));
-    }
-
-    .footer {
-      margin-top: 48px;
-      text-align: center;
-      font-size: 12px;
-      color: var(--text-dim);
-      font-weight: 300;
-      letter-spacing: 1px;
-    }
-
-    .footer a {
-      color: var(--gold-dim);
-      text-decoration: none;
-    }
-
-    .ramadan-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(201,168,76,0.1);
-      border: 1px solid rgba(201,168,76,0.2);
-      border-radius: 20px;
-      padding: 6px 14px;
-      font-size: 12px;
-      color: var(--gold);
-      letter-spacing: 1px;
-      margin-bottom: 24px;
-      animation: pulse 3s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.2); }
-      50% { box-shadow: 0 0 0 8px rgba(201,168,76,0); }
-    }
+    .card-icon { font-size: 36px; margin-bottom: 12px; display: block; }
+    .card-label { font-size: 11px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; font-weight: 500; margin-bottom: 6px; }
+    .card-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; color: var(--cream); margin-bottom: 8px; line-height: 1.2; }
+    .card-desc { font-size: 13px; color: var(--text-dim); line-height: 1.6; font-weight: 300; }
+    .card-arrow { position: absolute; right: 24px; top: 50%; transform: translateY(-50%); color: var(--gold-dim); font-size: 20px; transition: all 0.3s ease; }
+    .card:hover .card-arrow { color: var(--gold); right: 20px; }
+    .card-bingo { background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(180,120,40,0.05)); }
+    .footer { margin-top: 48px; text-align: center; font-size: 12px; color: var(--text-dim); font-weight: 300; letter-spacing: 1px; line-height: 1.8; }
+    .ramadan-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.2); border-radius: 20px; padding: 6px 14px; font-size: 12px; color: var(--gold); letter-spacing: 1px; margin-bottom: 24px; animation: pulse 3s ease-in-out infinite; transition: all 0.4s; }
+    @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.2); } 50% { box-shadow: 0 0 0 8px rgba(201,168,76,0); } }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="moon-wrap">
-      <div class="moon">☽</div>
-    </div>
-
+    <div class="moon-wrap"><div class="moon">☽</div></div>
     <h1 class="app-name"><span>Noor</span></h1>
     <div class="arabic-sub">نور</div>
-
-    <div class="ramadan-badge">
-      ✦ Ramadan Mubarak ✦
-    </div>
-
-    <p class="tagline">Your companion for the blessed month</p>
-
+    <div class="ramadan-badge" id="ramadan-badge">✦ Ramadan Mubarak ✦</div>
+    <p class="tagline" id="tagline">Your companion for the blessed month</p>
     <div class="cards">
       <a href="bingo.html" class="card card-bingo">
         <span class="card-icon">☑️</span>
@@ -272,7 +80,6 @@
         <div class="card-desc">How is Ramadan really going for you? Tap what applies. No judgment.</div>
         <span class="card-arrow">→</span>
       </a>
-
       <a href="dua.html" class="card">
         <span class="card-icon">🤲</span>
         <div class="card-label">For the heart</div>
@@ -281,16 +88,12 @@
         <span class="card-arrow">→</span>
       </a>
     </div>
-
-    <div class="footer">
-      Made with love for the Ummah &nbsp;·&nbsp; Ramadan 1447H<br>
-      Abolade Lawal
-    </div>
+    <div class="footer">Made with love for the Ummah &nbsp;·&nbsp; Ramadan 1447H<br>Abolade Lawal</div>
   </div>
 
   <!-- Welcome popup for ?ref=share visitors -->
   <div id="welcome-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999; align-items:center; justify-content:center; padding:24px;">
-    <div style="background:#0f0f1a; border:1px solid rgba(201,168,76,0.4); border-radius:20px; padding:36px 28px; max-width:380px; width:100%; text-align:center; position:relative;">
+    <div style="background:#0f0f1a; border:1px solid rgba(201,168,76,0.4); border-radius:20px; padding:36px 28px; max-width:380px; width:100%; text-align:center;">
       <div style="font-size:48px; margin-bottom:12px;">🌙</div>
       <div style="font-family:'Cormorant Garamond',serif; font-size:32px; color:#e8c97a; margin-bottom:8px;">Ramadan Mubarak</div>
       <div style="font-size:14px; color:#8a7d6a; line-height:1.7; margin-bottom:24px;">Someone thought of you this Ramadan.<br>Explore the bingo, find a dua for your heart.</div>
@@ -298,13 +101,41 @@
     </div>
   </div>
 
-  <div id="toast-share" style="position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(100px);background:rgba(201,168,76,0.9);color:#0a0a0f;padding:12px 24px;border-radius:30px;font-size:13px;font-weight:500;transition:transform 0.3s ease;z-index:200;">Link copied! Share it 🌙</div>
-
   <script>
     // Show welcome popup if ?ref=share
     if (window.location.search.includes('ref=share')) {
       document.getElementById('welcome-overlay').style.display = 'flex';
     }
+
+    // Ramadan 1447H — started 1 March 2025 WAT (UTC+1)
+    // Uses user's device time so it auto-updates per timezone
+    const RAMADAN_START = new Date('2025-03-01T00:00:00+01:00');
+
+    function getRamadanDay() {
+      const diffMs = new Date() - RAMADAN_START;
+      return Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
+    }
+
+    function updateBadge() {
+      const day = getRamadanDay();
+      const badge = document.getElementById('ramadan-badge');
+      const tagline = document.getElementById('tagline');
+      if (day >= 1 && day <= 10) {
+        badge.innerHTML = `✦ Ramadan Day ${day} · 1447H ✦`;
+        tagline.textContent = 'The first 10 days — the days of Mercy';
+      } else if (day >= 11 && day <= 20) {
+        badge.innerHTML = `✦ Ramadan Day ${day} · 1447H ✦`;
+        tagline.textContent = 'The second 10 days — the days of Forgiveness';
+      } else if (day >= 21 && day <= 30) {
+        badge.innerHTML = `✦ Ramadan Day ${day} · 1447H ✦`;
+        tagline.textContent = 'The last 10 days — seek Laylatul Qadr 🌙';
+      } else if (day > 30) {
+        badge.innerHTML = `✦ Eid Mubarak 🌙 ✦`;
+        tagline.textContent = 'May Allah accept from us and from you';
+      }
+    }
+
+    updateBadge();
   </script>
 </body>
 </html>
