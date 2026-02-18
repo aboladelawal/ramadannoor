@@ -2,18 +2,30 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/*.js",
+      "src": "api/dua.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "*.html",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "src": "/api/dua",
+      "dest": "/api/dua.js"
     },
     {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "src": "/bingo",
+      "dest": "/bingo.html"
+    },
+    {
+      "src": "/dua",
+      "dest": "/dua.html"
+    },
+    {
+      "src": "/",
+      "dest": "/index.html"
     }
   ]
 }
