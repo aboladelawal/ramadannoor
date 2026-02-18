@@ -115,29 +115,41 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 6px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
       margin-bottom: 24px;
     }
 
     .square {
-      aspect-ratio: 1;
       background: rgba(255,255,255,0.03);
       border: 1px solid rgba(201,168,76,0.12);
-      border-radius: 8px;
-      padding: 6px 4px;
+      border-radius: 12px;
+      padding: 12px 8px;
       cursor: pointer;
       transition: all 0.25s ease;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-      font-size: 9px;
       color: var(--text-dim);
-      line-height: 1.3;
+      line-height: 1.5;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
       position: relative;
+      min-height: 100px;
+      gap: 6px;
+    }
+
+    .square .sq-emoji {
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .square .sq-text {
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--text);
     }
 
     .square:hover {
@@ -151,12 +163,14 @@
       color: var(--gold-light);
     }
 
+    .square.checked .sq-text { color: var(--gold-light); }
+
     .square.checked::after {
       content: '✓';
       position: absolute;
-      top: 3px;
-      right: 5px;
-      font-size: 8px;
+      top: 5px;
+      right: 8px;
+      font-size: 10px;
       color: var(--gold);
     }
 
@@ -205,7 +219,6 @@
       box-shadow: none;
     }
 
-    /* Result overlay */
     .result-overlay {
       display: none;
       position: fixed;
@@ -218,9 +231,7 @@
       backdrop-filter: blur(8px);
     }
 
-    .result-overlay.show {
-      display: flex;
-    }
+    .result-overlay.show { display: flex; }
 
     .result-card {
       background: linear-gradient(135deg, #0f0f1a, #12121f);
@@ -275,11 +286,7 @@
       font-weight: 300;
     }
 
-    .result-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+    .result-actions { display: flex; flex-direction: column; gap: 10px; }
 
     .btn-share {
       background: linear-gradient(135deg, var(--gold), #a07828);
@@ -291,7 +298,6 @@
       font-size: 15px;
       font-weight: 500;
       cursor: pointer;
-      letter-spacing: 0.5px;
       transition: all 0.3s;
     }
 
@@ -326,7 +332,6 @@
 
     .btn-retry:hover { color: var(--gold); }
 
-    /* Share toast */
     .toast {
       position: fixed;
       bottom: 32px;
@@ -357,7 +362,7 @@
 
     <div class="score-bar">
       <span class="score-label">SQUARES CHECKED</span>
-      <div class="score-count"><span id="checked-count">0</span> <span>/ 25</span></div>
+      <div class="score-count"><span id="checked-count">0</span> <span>/ 15</span></div>
     </div>
 
     <div class="grid" id="bingo-grid"></div>
@@ -366,12 +371,11 @@
     <button class="btn btn-outline" onclick="resetGrid()">Start Fresh</button>
   </div>
 
-  <!-- Result Overlay -->
   <div class="result-overlay" id="result-overlay">
     <div class="result-card" id="result-card">
       <div class="result-moon">🌙</div>
       <div class="result-score" id="result-score">0</div>
-      <div class="result-out-of">OUT OF 25</div>
+      <div class="result-out-of">OUT OF 15</div>
       <div class="result-title" id="result-title"></div>
       <div class="result-message" id="result-message"></div>
       <div class="result-actions">
@@ -386,83 +390,75 @@
 
   <script>
     const ALL_SQUARES = [
-      // Sahur Struggles
-      "Slept through Sahur completely",
-      "Ate last night's jollof as Sahur",
-      "Set 4 alarms, snoozed all of them",
-      "Drank so much water at Sahur your stomach sloshed",
-      "Ate standing up because no time to sit",
-      "Sahur was just biscuit and tea",
-      "Woke for Sahur, saw the time, went back to sleep",
-      "Made a full pot of rice at 3am like you had sense",
-      // Fasting Struggles
-      "Checked the time every 10 mins after Asr",
-      "Argued while fasting then said Astaghfirullah",
-      "Accidentally swallowed your saliva and panicked",
-      "Smelled food and stood there too long",
-      "Said 'I'm fasting' to win an argument",
-      "Cooked for others and suffered in silence",
-      "Googled 'does this break my fast' at least once",
-      "Thought about Iftar food since Fajr",
-      // Spiritual Moments
-      "Cried during a dua and didn't expect to",
-      "Said you'd finish the Quran this Ramadan",
-      "Opened Quran app, ended up on TikTok",
-      "Prayed Tarawih then left after 4 rakaat",
-      "Made a dua so specific only Allah understood",
-      "Fell asleep in sujood, called it spiritual rest",
-      "Promised Allah things you're still negotiating",
-      "Had a genuine moment of peace at Tahajjud",
-      // Iftar Energy
-      "Broke fast with dates then ate like it's your last meal",
-      "Iftar food coma hit before Maghrib was over",
-      "Cooked a full feast for Iftar alone",
-      "First sip of water felt like paradise",
-      "Overate at Iftar then felt guilty at Tarawih",
-      "Said 'just one more' at Iftar table four times",
-      "An Iftar spread at someone's house humbled you",
-      "Finished eating and it was only 7pm",
-      // Nigerian Flavor
-      "Your mum woke the whole house with maximum noise",
-      "Someone fried fish in the house during your fast",
-      "Aunty brought food 'just to greet' and you suffered",
-      "Your non-Muslim coworker ate in front of you and smiled",
-      "Family Iftar turned into a full owambe somehow",
-      "Explained fasting to someone for the 10th time",
-      "Mum's soup made the whole house smell dangerous",
-      "Boss scheduled a lunch meeting during Ramadan",
-      // Relapse Moments
-      "Listened to music then felt bad then listened again",
-      "Got angry then remembered you're fasting",
-      "Backbited someone then said Astaghfirullah immediately",
-      "Watched something you shouldn't, closed it, opened it again",
-      "Skipped a prayer and told yourself you'd make it up",
-      "Napped so hard you missed Asr",
-      "Complained about hunger out loud then caught yourself",
-      "Scrolled Twitter 2 hours instead of reading Quran",
-      // End of Ramadan
-      "Felt sad Ramadan is ending before it started",
-      "Last 10 nights hit different this year",
-      "Laylatul Qadr anxiety was very real",
-      "Made your best duas in the last 10 nights",
-      "Cried on Eid because Ramadan was over",
-      "Promised yourself next Ramadan will be different",
-      "Felt genuinely changed by this Ramadan",
-      "Eid morning felt bittersweet",
-      // Bonus Chaos
-      "Lost your temper in traffic while fasting",
-      "A child offered you food innocently and it hurt",
-      "Dreamed about food during a nap",
-      "Said Bismillah then realized it wasn't Iftar yet"
+      "😴 Slept through Sahur completely",
+      "🍚 Ate last night's jollof as Sahur",
+      "⏰ Set 4 alarms, snoozed all of them",
+      "💧 Drank so much water at Sahur your stomach sloshed",
+      "🧍 Ate standing up, no time to sit",
+      "🍪 Sahur was just biscuit and tea",
+      "😵 Woke for Sahur, saw the time, went back to sleep",
+      "🍳 Made a full pot of rice at 3am like you had sense",
+      "🕐 Checked the time every 10 mins after Asr",
+      "😤 Argued while fasting then said Astaghfirullah",
+      "😰 Accidentally swallowed your saliva and panicked",
+      "👃 Smelled food and stood there too long",
+      "✋ Said 'I'm fasting' to win an argument",
+      "🍲 Cooked for others and suffered in silence",
+      "🔍 Googled 'does this break my fast' at least once",
+      "🤤 Thought about Iftar food since Fajr",
+      "😢 Cried during a dua and didn't expect to",
+      "📖 Said you'd finish the Quran this Ramadan",
+      "📱 Opened Quran app, ended up on TikTok",
+      "🕌 Prayed Tarawih then left after 4 rakaat",
+      "🤲 Made a dua so specific only Allah understood",
+      "😪 Fell asleep in sujood, called it spiritual rest",
+      "🤝 Promised Allah things you're still negotiating",
+      "🌙 Had a genuine moment of peace at Tahajjud",
+      "🌴 Broke fast with dates then ate like it's your last meal",
+      "😵 Iftar food coma hit before Maghrib was over",
+      "👨‍🍳 Cooked a full feast for Iftar alone",
+      "💦 First sip of water felt like paradise",
+      "😬 Overate at Iftar then felt guilty at Tarawih",
+      "😅 Said 'just one more' at Iftar table four times",
+      "🫣 An Iftar spread at someone's house humbled you",
+      "⏱️ Finished eating and it was only 7pm",
+      "📢 Your mum woke the whole house with maximum noise",
+      "🐟 Someone fried fish in the house during your fast",
+      "🥘 Aunty brought food 'just to greet' and you suffered",
+      "😒 Your coworker ate in front of you and smiled",
+      "🎉 Family Iftar turned into a full owambe somehow",
+      "😩 Explained fasting to someone for the 10th time",
+      "🍛 Mum's soup made the whole house smell dangerous",
+      "💼 Boss scheduled a lunch meeting during Ramadan",
+      "🎵 Listened to music, felt bad, listened again",
+      "😠 Got angry then remembered you're fasting",
+      "👀 Backbited someone then said Astaghfirullah",
+      "📺 Watched something you shouldn't, closed it, opened it again",
+      "🙈 Skipped a prayer, told yourself you'd make it up",
+      "💤 Napped so hard you missed Asr",
+      "😮 Complained about hunger out loud then caught yourself",
+      "🐦 Scrolled Twitter 2 hours instead of reading Quran",
+      "😔 Felt sad Ramadan is ending before it started",
+      "✨ Last 10 nights hit different this year",
+      "😟 Laylatul Qadr anxiety was very real",
+      "🌟 Made your best duas in the last 10 nights",
+      "😭 Cried on Eid because Ramadan was over",
+      "💪 Promised yourself next Ramadan will be different",
+      "💛 Felt genuinely changed by this Ramadan",
+      "🌅 Eid morning felt bittersweet",
+      "🚗 Lost your temper in traffic while fasting",
+      "👶 A child offered you food innocently and it hurt",
+      "🍕 Dreamed about food during a nap",
+      "🤦 Said Bismillah then realized it wasn't Iftar yet"
     ];
 
     const RESULTS = [
-      { min: 0,  max: 3,  title: "Masha Allah, are you even human?", message: "Either you're extremely disciplined or you haven't been paying attention. Either way, we respect it. Ramadan Kareem. 🌙" },
-      { min: 4,  max: 8,  title: "Solid Muslim, few struggles", message: "You're doing well, honestly. A few moments of chaos but mostly holding it together. Allah sees the effort. Keep going." },
-      { min: 9,  max: 13, title: "Ramadan Warrior", message: "Fighting battles on multiple fronts — the hunger, the naps, the TikTok temptation. You're still here. That counts for everything." },
-      { min: 14, max: 18, title: "Certified Ramadan Experience Haver", message: "You have LIVED this Ramadan. Every struggle, every moment of weakness, every unexpected tear. This is real. Allah loves the ones who keep trying. 🤍" },
-      { min: 19, max: 22, title: "This Ramadan Has Been a Journey 😅", message: "Chaos, grace, guilt, genuine moments — you've had it all. The beautiful thing? You're still here, still fasting, still trying. That's what Ramadan is about." },
-      { min: 23, max: 25, title: "The Most Honest Muslim in the Room", message: "You ticked almost everything. No pretending. No performing. Just real, honest, human Ramadan. Allah loves honesty more than perfection. Ramadan Mubarak. 💛" }
+      { min: 0,  max: 2,  title: "Masha Allah, are you even human?", message: "Either you're extremely disciplined or you haven't been paying attention. Either way, we respect it. Ramadan Kareem. 🌙" },
+      { min: 3,  max: 5,  title: "Solid Muslim, few struggles", message: "You're doing well, honestly. A few moments of chaos but mostly holding it together. Allah sees the effort. Keep going." },
+      { min: 6,  max: 8,  title: "Ramadan Warrior", message: "Fighting battles on multiple fronts — the hunger, the naps, the TikTok temptation. You're still here. That counts for everything." },
+      { min: 9,  max: 11, title: "Certified Ramadan Experience Haver", message: "You have LIVED this Ramadan. Every struggle, every moment of weakness, every unexpected tear. This is real. Allah loves the ones who keep trying. 🤍" },
+      { min: 12, max: 13, title: "This Ramadan Has Been a Journey 😅", message: "Chaos, grace, guilt, genuine moments — you've had it all. The beautiful thing? You're still here, still fasting, still trying. That's what Ramadan is about." },
+      { min: 14, max: 15, title: "The Most Honest Muslim in the Room", message: "You ticked almost everything. No pretending. No performing. Just real, honest, human Ramadan. Allah loves honesty more than perfection. Ramadan Mubarak. 💛" }
     ];
 
     let selected = new Set();
@@ -479,14 +475,30 @@
 
     function buildGrid() {
       selected.clear();
-      currentSquares = shuffle(ALL_SQUARES).slice(0, 25);
+      currentSquares = shuffle(ALL_SQUARES).slice(0, 15);
       const grid = document.getElementById('bingo-grid');
       grid.innerHTML = '';
 
       currentSquares.forEach((text, i) => {
         const sq = document.createElement('div');
         sq.className = 'square';
-        sq.textContent = text;
+
+        const emojiMatch = text.match(/^(\S+)\s(.+)$/);
+        if (emojiMatch) {
+          const emojiEl = document.createElement('span');
+          emojiEl.className = 'sq-emoji';
+          emojiEl.textContent = emojiMatch[1];
+
+          const textEl = document.createElement('span');
+          textEl.className = 'sq-text';
+          textEl.textContent = emojiMatch[2];
+
+          sq.appendChild(emojiEl);
+          sq.appendChild(textEl);
+        } else {
+          sq.textContent = text;
+        }
+
         sq.dataset.index = i;
         sq.addEventListener('click', () => toggleSquare(sq, i));
         grid.appendChild(sq);
@@ -515,7 +527,6 @@
     function showResult() {
       const count = selected.size;
       const result = RESULTS.find(r => count >= r.min && count <= r.max) || RESULTS[RESULTS.length - 1];
-
       document.getElementById('result-score').textContent = count;
       document.getElementById('result-title').textContent = result.title;
       document.getElementById('result-message').textContent = result.message;
@@ -526,14 +537,12 @@
       document.getElementById('result-overlay').classList.remove('show');
     }
 
-    function resetGrid() {
-      buildGrid();
-    }
+    function resetGrid() { buildGrid(); }
 
     async function shareResult() {
       const count = selected.size;
       const result = RESULTS.find(r => count >= r.min && count <= r.max) || RESULTS[RESULTS.length - 1];
-      const text = `I scored ${count}/25 on the Ramadan Real Talk Bingo 🌙\n\nMy title: "${result.title}"\n\nWhat's yours? → knowyourboo.vercel.app/noor\n\n#Ramadan #NoorApp`;
+      const text = `I scored ${count}/15 on the Ramadan Real Talk Bingo 🌙\n\nMy title: "${result.title}"\n\nWhat's yours? → noor.vercel.app\n\n#Ramadan #NoorApp`;
 
       try {
         if (navigator.share) {
@@ -543,10 +552,7 @@
           showToast();
         }
       } catch {
-        try {
-          await navigator.clipboard.writeText(text);
-          showToast();
-        } catch { showToast('Share manually from the text above'); }
+        try { await navigator.clipboard.writeText(text); showToast(); } catch {}
       }
     }
 
@@ -557,7 +563,6 @@
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // Init
     buildGrid();
   </script>
 </body>
