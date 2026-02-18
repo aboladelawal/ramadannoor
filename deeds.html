@@ -136,6 +136,7 @@
     <div class="header">
       <span class="header-icon">✅</span>
       <h1>Good Deeds</h1>
+      <div id="deeds-greeting" style="font-size:13px; color:var(--gold-dim); font-style:italic; margin-top:6px; min-height:18px;"></div>
       <p>Tap what you've done today. Every small act is recorded.</p>
     </div>
 
@@ -385,6 +386,10 @@
     }
 
     // ── Init ──────────────────────────────────────────────────────
+    const savedName = localStorage.getItem('noor_name');
+    if (savedName) {
+      document.getElementById('deeds-greeting').textContent = `Keep going, ${savedName} — Allah sees every deed 🌙`;
+    }
     renderDeeds();
     updateScore();
     renderCalendar();

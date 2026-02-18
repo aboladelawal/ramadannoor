@@ -151,13 +151,42 @@
       cursor: pointer;
       transition: all 0.2s;
       font-family: 'Tajawal', sans-serif;
+      user-select: none;
     }
 
-    .suggestion:hover {
+    .suggestion:hover:not(.disabled) {
       border-color: rgba(201,168,76,0.4);
       color: var(--gold);
       background: rgba(201,168,76,0.12);
     }
+
+    .suggestion.selected {
+      background: rgba(201,168,76,0.22);
+      border-color: var(--gold);
+      color: var(--gold-light);
+      font-weight: 500;
+    }
+
+    .suggestion.selected::after {
+      content: ' ✓';
+      font-size: 10px;
+    }
+
+    .suggestion.disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .chip-hint {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-top: 8px;
+      letter-spacing: 0.5px;
+      min-height: 16px;
+      transition: color 0.2s;
+    }
+
+    .chip-hint.limit { color: var(--gold); }
 
     .btn {
       width: 100%;
@@ -436,32 +465,34 @@
       <h1>Ya Allah...</h1>
       <div class="header-arabic">يا الله</div>
       <p>Tell Him what's on your heart today. He already knows, but He loves to hear it from you.</p>
+      <div id="dua-greeting" style="font-size:13px; color:var(--gold-dim); font-style:italic; margin-top:8px; min-height:18px;"></div>
     </div>
 
     <div class="input-section" id="input-section">
       <label class="input-label">What's on your heart?</label>
       <textarea id="user-input" rows="4" placeholder="I'm struggling with exams and feeling overwhelmed... / I don't know what's wrong with me lately... / I feel lost and need direction..."></textarea>
 
-      <div class="suggestions">
-        <span class="suggestion" onclick="fillSuggestion('heartbreak')">💔 Heartbreak</span>
-        <span class="suggestion" onclick="fillSuggestion('exams')">📚 Exams</span>
-        <span class="suggestion" onclick="fillSuggestion('job search')">💼 Job search</span>
-        <span class="suggestion" onclick="fillSuggestion('anxiety')">😰 Anxiety</span>
-        <span class="suggestion" onclick="fillSuggestion('gratitude')">🙏 Gratitude</span>
-        <span class="suggestion" onclick="fillSuggestion('family issues')">👨‍👩‍👦 Family issues</span>
-        <span class="suggestion" onclick="fillSuggestion('health')">💊 Health</span>
-        <span class="suggestion" onclick="fillSuggestion('feeling lost')">😔 Feeling lost</span>
-        <span class="suggestion" onclick="fillSuggestion('depression')">🌧️ Depression</span>
-        <span class="suggestion" onclick="fillSuggestion('loneliness')">🫂 Loneliness</span>
-        <span class="suggestion" onclick="fillSuggestion('debt and money problems')">💸 Debt</span>
-        <span class="suggestion" onclick="fillSuggestion('marriage')">💍 Marriage</span>
-        <span class="suggestion" onclick="fillSuggestion('grief and loss')">🕊️ Grief</span>
-        <span class="suggestion" onclick="fillSuggestion('purpose and direction in life')">🧭 Purpose</span>
-        <span class="suggestion" onclick="fillSuggestion('success and goals')">🏆 Success</span>
-        <span class="suggestion" onclick="fillSuggestion('forgiveness and guilt')">🤍 Forgiveness</span>
-        <span class="suggestion" onclick="fillSuggestion('travel and safety')">✈️ Travel</span>
-        <span class="suggestion" onclick="fillSuggestion('new baby and parenthood')">👶 New baby</span>
+      <div class="suggestions" id="suggestions">
+        <span class="suggestion" onclick="toggleSuggestion(this, 'heartbreak')">💔 Heartbreak</span>
+        <span class="suggestion" onclick="toggleSuggestion(this, 'exams')">📚 Exams</span>
+        <span class="suggestion" onclick="toggleSuggestion(this, 'job search')">💼 Job search</span>
+        <span class="suggestion" onclick="toggleSuggestion(this, 'anxiety')">😰 Anxiety</span>
+        <span class="suggestion" onclick="toggleSuggestion(this, 'gratitude')">🙏 Gratitude</span>
+        <span class="suggestion" onclick="toggleSuggestion(this, 'family issues')">👨‍👩‍👦 Family issues</span>
+        <span class="suggestion" onclick="toggleSuggestion(this, 'health')">💊 Health</span>
+        <span class="suggestion" onclick="toggleSuggestion(this, 'feeling lost')">😔 Feeling lost</span>
+        <span class="suggestion" onclick="toggleSuggestion(this, 'depression')">🌧️ Depression</span>
+        <span class="suggestion" onclick="toggleSuggestion(this, 'loneliness')">🫂 Loneliness</span>
+        <span class="suggestion" onclick="toggleSuggestion(this, 'debt and money problems')">💸 Debt</span>
+        <span class="suggestion" onclick="toggleSuggestion(this, 'marriage')">💍 Marriage</span>
+        <span class="suggestion" onclick="toggleSuggestion(this, 'grief and loss')">🕊️ Grief</span>
+        <span class="suggestion" onclick="toggleSuggestion(this, 'purpose and direction in life')">🧭 Purpose</span>
+        <span class="suggestion" onclick="toggleSuggestion(this, 'success and goals')">🏆 Success</span>
+        <span class="suggestion" onclick="toggleSuggestion(this, 'forgiveness and guilt')">🤍 Forgiveness</span>
+        <span class="suggestion" onclick="toggleSuggestion(this, 'travel and safety')">✈️ Travel</span>
+        <span class="suggestion" onclick="toggleSuggestion(this, 'new baby and parenthood')">👶 New baby</span>
       </div>
+      <div class="chip-hint" id="chip-hint">Select up to 3 topics, or type your own above</div>
 
       <button class="btn" id="generate-btn" onclick="generateDua()">🤲 Generate My Dua</button>
     </div>
@@ -822,9 +853,48 @@
     let lastDuaId = null;
     let currentDuaText = '';
 
-    function fillSuggestion(topic) {
-      document.getElementById('user-input').value = `I'm going through ${topic} right now and need guidance`;
-      document.getElementById('user-input').focus();
+    const MAX_CHIPS = 3;
+    let selectedChips = [];
+
+    function toggleSuggestion(el, topic) {
+      const isSelected = el.classList.contains('selected');
+      const hint = document.getElementById('chip-hint');
+
+      if (isSelected) {
+        // Deselect
+        el.classList.remove('selected');
+        selectedChips = selectedChips.filter(t => t !== topic);
+        // Re-enable all disabled chips
+        document.querySelectorAll('.suggestion.disabled').forEach(s => s.classList.remove('disabled'));
+        hint.textContent = selectedChips.length > 0
+          ? `${selectedChips.length}/3 selected — tap to deselect`
+          : 'Select up to 3 topics, or type your own above';
+        hint.classList.remove('limit');
+      } else {
+        if (selectedChips.length >= MAX_CHIPS) return;
+        el.classList.add('selected');
+        selectedChips.push(topic);
+        if (selectedChips.length === MAX_CHIPS) {
+          // Disable unselected chips
+          document.querySelectorAll('.suggestion:not(.selected)').forEach(s => s.classList.add('disabled'));
+          hint.textContent = 'Maximum 3 selected ✓';
+          hint.classList.add('limit');
+        } else {
+          hint.textContent = `${selectedChips.length}/3 selected`;
+          hint.classList.remove('limit');
+        }
+      }
+    }
+
+    function buildInput() {
+      const typed = document.getElementById('user-input').value.trim();
+      if (selectedChips.length > 0 && typed) {
+        // Combine both
+        return `${typed}. Also dealing with: ${selectedChips.join(', ')}`;
+      } else if (selectedChips.length > 0) {
+        return `I'm going through ${selectedChips.join(', and ')} right now and need guidance`;
+      }
+      return typed;
     }
 
     function matchDua(input) {
@@ -862,7 +932,7 @@
     }
 
     async function generateDua() {
-      const input = document.getElementById('user-input').value.trim();
+      const input = buildInput();
       if (!input) {
         document.getElementById('user-input').focus();
         return;
@@ -959,6 +1029,12 @@
       document.getElementById('input-section').style.display = 'block';
       document.getElementById('user-input').value = '';
       lastDuaId = null;
+      // Reset chips
+      selectedChips = [];
+      document.querySelectorAll('.suggestion').forEach(s => s.classList.remove('selected', 'disabled'));
+      const hint = document.getElementById('chip-hint');
+      hint.textContent = 'Select up to 3 topics, or type your own above';
+      hint.classList.remove('limit');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -973,6 +1049,13 @@
           setTimeout(() => toast.classList.remove('show'), 3000);
         }
       } catch {}
+    }
+
+    // Name greeting
+    const _name = localStorage.getItem('noor_name');
+    if (_name) {
+      const el = document.getElementById('dua-greeting');
+      if (el) el.textContent = `What's on your heart today, ${_name}?`;
     }
   </script>
 </body>

@@ -374,6 +374,7 @@
     <div class="header">
       <div class="header-icon">☑️</div>
       <h1>Ramadan Real Talk</h1>
+      <div id="bingo-greeting" style="font-size:13px; color:var(--gold-dim); font-style:italic; margin-bottom:4px; min-height:18px;"></div>
       <p>Tap every square that applies to you. No judgment here.</p>
     </div>
 
@@ -598,6 +599,13 @@
 
     // Init
     buildGrid();
+
+    // Name greeting
+    const _bingoName = localStorage.getItem('noor_name');
+    if (_bingoName) {
+      const el = document.getElementById('bingo-greeting');
+      if (el) el.textContent = `Be honest, ${_bingoName} 😄`;
+    }
   </script>
 </body>
 </html>
