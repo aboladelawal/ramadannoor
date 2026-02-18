@@ -124,9 +124,30 @@
     .cal-num { font-weight: 600; font-size: 12px; }
     .cal-dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
 
-    /* Toast */
-    .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(201,168,76,0.95); color: #0a0a0f; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 500; transition: transform 0.3s ease; z-index: 200; white-space: nowrap; }
-    .toast.show { transform: translateX(-50%) translateY(0); }
+    /* Stars */
+    .stars-row { display: flex; justify-content: center; gap: 6px; margin-top: 8px; margin-bottom: 4px; }
+    .star { font-size: 20px; opacity: 0.18; transition: opacity 0.4s ease, transform 0.4s ease; }
+    .star.lit { opacity: 1; transform: scale(1.15); }
+    .star.just-lit { animation: starPop 0.5s ease forwards; }
+    @keyframes starPop {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.5); }
+      100% { transform: scale(1.15); }
+    }
+
+    /* Inline affirmation */
+    .affirmation {
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      font-style: italic;
+      color: var(--gold-dim);
+      min-height: 22px;
+      margin-top: 6px;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+    .affirmation.show { opacity: 1; }
   </style>
 </head>
 <body>
@@ -148,6 +169,14 @@
         <span class="score-num" id="score-num">0</span>
         <span class="score-denom" id="score-denom">/ 0 done</span>
       </div>
+      <div class="stars-row" id="stars-row">
+        <span class="star" id="star-1">★</span>
+        <span class="star" id="star-2">★</span>
+        <span class="star" id="star-3">★</span>
+        <span class="star" id="star-4">★</span>
+        <span class="star" id="star-5">★</span>
+      </div>
+      <div class="affirmation" id="affirmation"></div>
       <div class="score-label" id="score-label">What have you done today?</div>
       <div class="streak-badge" id="streak-badge">🔥 <span id="streak-num">0</span> day streak</div>
     </div>
@@ -171,8 +200,6 @@
       <div class="calendar-strip" id="calendar-strip"></div>
     </div>
   </div>
-
-  <div class="toast" id="toast"></div>
 
   <script>
     // ── Ramadan setup ─────────────────────────────────────────────
@@ -285,21 +312,56 @@
     let done = getTodayDeeds();
     const totalDeeds = CATEGORIES.reduce((s, c) => s + c.deeds.length, 0);
 
-    function updateScore() {
+    // ── Star thresholds (out of 18 total deeds) ───────────────────
+    // 1★ = 1-3  | 2★ = 4-6  | 3★ = 7-10  | 4★ = 11-14  | 5★ = 15+
+    function getStars(count) {
+      if (count >= 15) return 5;
+      if (count >= 11) return 4;
+      if (count >= 7)  return 3;
+      if (count >= 4)  return 2;
+      if (count >= 1)  return 1;
+      return 0;
+    }
+
+    let prevStars = 0;
+
+    function updateScore(justCheckedId) {
       done = getTodayDeeds();
-      const count = Object.values(done).filter(Boolean).length;
-      const pct   = Math.round((count / totalDeeds) * 100);
+      const count   = Object.values(done).filter(Boolean).length;
+      const pct     = Math.round((count / totalDeeds) * 100);
+      const stars   = getStars(count);
 
       document.getElementById('score-num').textContent = count;
       document.getElementById('score-denom').textContent = `/ ${totalDeeds} done`;
       document.getElementById('score-ring').style.setProperty('--pct', pct + '%');
 
+      // Update stars — animate newly lit ones
+      for (let i = 1; i <= 5; i++) {
+        const el = document.getElementById(`star-${i}`);
+        el.classList.toggle('lit', i <= stars);
+        if (i <= stars && i > prevStars) {
+          el.classList.remove('just-lit');
+          void el.offsetWidth; // reflow to restart animation
+          el.classList.add('just-lit');
+        }
+      }
+
+      // Show inline affirmation when a deed is checked (not unchecked)
+      if (justCheckedId) {
+        const newStarEarned = stars > prevStars;
+        showAffirmation(count, stars, newStarEarned);
+      }
+
+      prevStars = stars;
+
+      // Score label
       const labels = [
         [0,  'What have you done today?'],
-        [3,  'A good start — keep going'],
-        [8,  'MashaAllah, you\'re doing well'],
-        [14, 'SubhanAllah — almost there!'],
-        [totalDeeds, 'MashaAllah! Full day! 🌟'],
+        [1,  'A good start — keep going'],
+        [4,  'MashaAllah, building momentum'],
+        [7,  'SubhanAllah — you\'re doing well'],
+        [11, 'Almost there — stay consistent'],
+        [15, 'MashaAllah! Full day! 🌟'],
       ];
       const label = [...labels].reverse().find(([n]) => count >= n);
       document.getElementById('score-label').textContent = label[1];
@@ -309,6 +371,50 @@
       if (count === totalDeeds) {
         document.getElementById('completion-msg').classList.add('show');
       }
+    }
+
+    // ── Affirmation messages ──────────────────────────────────────
+    const AFFIRMATIONS = [
+      'Allah sees this 🌙',
+      'BaarakAllahu feekum',
+      'Every deed is recorded',
+      'May Allah multiply your reward',
+      'The angels witness this',
+      'SubhanAllah — keep going',
+      'لا إله إلا الله',
+      'Allahu Akbar',
+      'Your fast is more beautiful for this',
+    ];
+    const STAR_AFFIRMATIONS = [
+      null,
+      'First star earned ✦',
+      'Two stars — masha\'Allah',
+      'Halfway to a full day ✦',
+      'Four stars — almost there',
+      '✦ Five stars — Ramadan Mubarak ✦',
+    ];
+
+    let affirmIdx = 0;
+    let affirmTimeout = null;
+
+    function showAffirmation(count, stars, newStar) {
+      const el = document.getElementById('affirmation');
+      const msg = newStar
+        ? STAR_AFFIRMATIONS[stars]
+        : AFFIRMATIONS[affirmIdx++ % AFFIRMATIONS.length];
+
+      if (!msg) return;
+
+      // Clear any running fade-out
+      if (affirmTimeout) clearTimeout(affirmTimeout);
+
+      el.textContent = msg;
+      el.classList.add('show');
+
+      // Stay for 4s then fade out
+      affirmTimeout = setTimeout(() => {
+        el.classList.remove('show');
+      }, 4000);
     }
 
     function renderDeeds() {
@@ -321,7 +427,6 @@
               <div class="deed-item ${done[d.id] ? 'done' : ''}" onclick="toggleDeed('${d.id}', this)">
                 <span class="deed-emoji">${d.emoji}</span>
                 <div class="deed-name">${d.name}</div>
-                <div class="deed-points">${d.pts}</div>
               </div>
             `).join('')}
           </div>
@@ -331,36 +436,19 @@
 
     function toggleDeed(id, el) {
       done = getTodayDeeds();
-      const wasD = done[id];
-      if (wasD) {
+      const wasChecked = done[id];
+      if (wasChecked) {
         delete done[id];
         el.classList.remove('done');
+        saveTodayDeeds(done);
+        updateScore(null); // unchecking — no affirmation
       } else {
         done[id] = true;
         el.classList.add('done');
-        showToast(wasD ? '' : getToastMsg());
+        saveTodayDeeds(done);
+        updateScore(id); // checking — show affirmation
       }
-      saveTodayDeeds(done);
-      updateScore();
       renderCalendar();
-    }
-
-    const TOASTS = [
-      'Recorded ✓ — Allah sees every good deed',
-      'BaarakAllahu feekum 🌙',
-      'SubhanAllah — keep going',
-      'Allahu Akbar — every deed counts',
-      'Recorded ✓ — May Allah multiply your reward',
-    ];
-    let toastIdx = 0;
-    function getToastMsg() { return TOASTS[toastIdx++ % TOASTS.length]; }
-
-    function showToast(msg) {
-      if (!msg) return;
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2500);
     }
 
     // Calendar strip
@@ -391,7 +479,9 @@
       document.getElementById('deeds-greeting').textContent = `Keep going, ${savedName} — Allah sees every deed 🌙`;
     }
     renderDeeds();
-    updateScore();
+    // Seed prevStars silently so page load doesn't trigger animations
+    prevStars = getStars(Object.values(getTodayDeeds()).filter(Boolean).length);
+    updateScore(null);
     renderCalendar();
   </script>
 </body>
