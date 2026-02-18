@@ -4,13 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Noor — Your Ramadan Companion</title>
-  <meta property="og:title" content="Noor — Your Ramadan Companion 🌙">
-<meta property="og:description" content="Ramadan Real Talk Bingo + Personal Dua Generator. Made for Muslims, with love.">
-<meta property="og:image" content="https://raw.githubusercontent.com/aboladelawal/noor/main/og-noor.png">
-<meta property="og:url" content="https://noor-seven-lac.vercel.app">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/aboladelawal/noor/main/og-noor.png">
+  <meta name="description" content="Ramadan Real Talk Bingo + Personal Dua Generator. Made for the Ummah. Ramadan 1447H.">
+  <meta property="og:title" content="Noor 🌙 — Your Ramadan Companion">
+  <meta property="og:description" content="Ramadan Real Talk Bingo + Personal Dua Generator. Made for Muslims, with love. Ramadan 1447H.">
+  <meta property="og:image" content="https://noor-seven-lac.vercel.app/og-noor.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://noor-seven-lac.vercel.app">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Noor 🌙 — Your Ramadan Companion">
+  <meta name="twitter:description" content="Ramadan Real Talk Bingo + Personal Dua Generator. Made for Muslims, with love.">
+  <meta name="twitter:image" content="https://noor-seven-lac.vercel.app/og-noor.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Tajawal:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
@@ -278,9 +283,28 @@
     </div>
 
     <div class="footer">
-      Made with love for the Ummah &nbsp;·&nbsp; Ramadan 1446H<br>
-      <a href="https://twitter.com/_kingmufasa">@_kingmufasa</a>
+      Made with love for the Ummah &nbsp;·&nbsp; Ramadan 1447H<br>
+      Abolade Lawal
     </div>
   </div>
+
+  <!-- Welcome popup for ?ref=share visitors -->
+  <div id="welcome-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999; align-items:center; justify-content:center; padding:24px;">
+    <div style="background:#0f0f1a; border:1px solid rgba(201,168,76,0.4); border-radius:20px; padding:36px 28px; max-width:380px; width:100%; text-align:center; position:relative;">
+      <div style="font-size:48px; margin-bottom:12px;">🌙</div>
+      <div style="font-family:'Cormorant Garamond',serif; font-size:32px; color:#e8c97a; margin-bottom:8px;">Ramadan Mubarak</div>
+      <div style="font-size:14px; color:#8a7d6a; line-height:1.7; margin-bottom:24px;">Someone thought of you this Ramadan.<br>Explore the bingo, find a dua for your heart.</div>
+      <button onclick="document.getElementById('welcome-overlay').style.display='none'" style="width:100%; padding:14px; background:linear-gradient(135deg,#c9a84c,#a07828); border:none; border-radius:12px; color:#0a0a0f; font-size:15px; font-weight:600; cursor:pointer; font-family:'Tajawal',sans-serif;">Enter Noor ✦</button>
+    </div>
+  </div>
+
+  <div id="toast-share" style="position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(100px);background:rgba(201,168,76,0.9);color:#0a0a0f;padding:12px 24px;border-radius:30px;font-size:13px;font-weight:500;transition:transform 0.3s ease;z-index:200;">Link copied! Share it 🌙</div>
+
+  <script>
+    // Show welcome popup if ?ref=share
+    if (window.location.search.includes('ref=share')) {
+      document.getElementById('welcome-overlay').style.display = 'flex';
+    }
+  </script>
 </body>
 </html>

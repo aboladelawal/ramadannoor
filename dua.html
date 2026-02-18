@@ -4,13 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ya Allah... — Noor</title>
- <meta property="og:title" content="Ya Allah... — Personal Dua Generator 🤲">
-<meta property="og:description" content="Tell Him what's on your heart. Get an authentic dua + personal message of encouragement.">
-<meta property="og:image" content="https://raw.githubusercontent.com/aboladelawal/noor/main/og-dua.png">
-<meta property="og:url" content="https://noor-seven-lac.vercel.app/dua">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/aboladelawal/noor/main/og-dua.png">
+  <meta name="description" content="Tell Him what's on your heart. Receive an authentic dua made just for your moment.">
+  <meta property="og:title" content="Ya Allah... 🤲 — Personal Dua Generator">
+  <meta property="og:description" content="Tell Him what's on your heart. Get an authentic dua + personal encouragement + action steps.">
+  <meta property="og:image" content="https://noor-seven-lac.vercel.app/og-dua.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://noor-seven-lac.vercel.app/dua">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Ya Allah... 🤲 — Personal Dua Generator">
+  <meta name="twitter:description" content="Tell Him what's on your heart. Receive a dua made just for your moment.">
+  <meta name="twitter:image" content="https://noor-seven-lac.vercel.app/og-dua.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Tajawal:wght@300;400;500&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <style>
@@ -69,16 +74,8 @@
     }
     .back:hover { color: var(--gold); }
 
-    .header {
-      text-align: center;
-      margin-bottom: 36px;
-    }
-
-    .header-icon {
-      font-size: 44px;
-      margin-bottom: 10px;
-      display: block;
-    }
+    .header { text-align: center; margin-bottom: 36px; }
+    .header-icon { font-size: 44px; margin-bottom: 10px; display: block; }
 
     .header h1 {
       font-family: 'Cormorant Garamond', serif;
@@ -106,10 +103,7 @@
       font-weight: 300;
     }
 
-    /* Input section */
-    .input-section {
-      margin-bottom: 24px;
-    }
+    .input-section { margin-bottom: 24px; }
 
     .input-label {
       font-size: 12px;
@@ -118,10 +112,6 @@
       text-transform: uppercase;
       margin-bottom: 10px;
       display: block;
-    }
-
-    .textarea-wrap {
-      position: relative;
     }
 
     textarea {
@@ -190,18 +180,9 @@
       box-shadow: 0 8px 24px rgba(201,168,76,0.3);
     }
 
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-    /* Loading */
-    .loading {
-      display: none;
-      text-align: center;
-      padding: 40px 20px;
-    }
-
+    .loading { display: none; text-align: center; padding: 40px 20px; }
     .loading.show { display: block; }
 
     .loading-dots {
@@ -228,18 +209,13 @@
     }
 
     .loading-text {
-      font-size: 14px;
       color: var(--text-dim);
       font-style: italic;
       font-family: 'Cormorant Garamond', serif;
       font-size: 18px;
     }
 
-    /* Dua result */
-    .dua-result {
-      display: none;
-    }
-
+    .dua-result { display: none; }
     .dua-result.show { display: block; }
 
     .dua-card {
@@ -255,9 +231,7 @@
     .dua-card::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       height: 2px;
       background: linear-gradient(90deg, transparent, var(--gold), transparent);
     }
@@ -290,11 +264,10 @@
     .dua-transliteration {
       font-style: italic;
       color: var(--gold-light);
-      font-size: 14px;
-      line-height: 1.8;
-      margin-bottom: 16px;
       font-family: 'Cormorant Garamond', serif;
       font-size: 18px;
+      line-height: 1.8;
+      margin-bottom: 16px;
     }
 
     .dua-meaning {
@@ -328,21 +301,59 @@
       font-weight: 300;
     }
 
-    .source-note {
+    .action-card {
+      background: rgba(201,168,76,0.05);
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+
+    .action-label {
       font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .action-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .action-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    .action-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+
+    .source-note {
+      font-style: italic;
       color: var(--text-dim);
       text-align: center;
-      font-style: italic;
       margin-bottom: 20px;
       font-family: 'Cormorant Garamond', serif;
       font-size: 14px;
     }
 
-    .result-actions {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+    .result-actions { display: flex; flex-direction: column; gap: 10px; }
 
     .btn-another {
       width: 100%;
@@ -357,10 +368,7 @@
       transition: all 0.3s;
     }
 
-    .btn-another:hover {
-      border-color: rgba(201,168,76,0.5);
-      background: rgba(201,168,76,0.05);
-    }
+    .btn-another:hover { border-color: rgba(201,168,76,0.5); background: rgba(201,168,76,0.05); }
 
     .btn-share-dua {
       width: 100%;
@@ -375,24 +383,31 @@
       transition: all 0.3s;
     }
 
-    .btn-share-dua:hover {
-      border-color: rgba(201,168,76,0.3);
-      color: var(--gold);
-    }
+    .btn-share-dua:hover { border-color: rgba(201,168,76,0.3); color: var(--gold); }
 
-    .error-msg {
-      display: none;
-      background: rgba(255,80,80,0.1);
-      border: 1px solid rgba(255,80,80,0.2);
-      border-radius: 10px;
-      padding: 12px 16px;
+    .btn-new {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      border: none;
+      font-family: 'Tajawal', sans-serif;
       font-size: 13px;
-      color: #ff8080;
-      margin-top: 12px;
-      text-align: center;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: color 0.2s;
     }
 
-    .error-msg.show { display: block; }
+    .btn-new:hover { color: var(--gold); }
+
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-dim);
+      font-weight: 300;
+      letter-spacing: 1px;
+      line-height: 1.8;
+    }
 
     .toast {
       position: fixed;
@@ -423,37 +438,39 @@
       <p>Tell Him what's on your heart today. He already knows, but He loves to hear it from you.</p>
     </div>
 
-    <!-- Input -->
     <div class="input-section" id="input-section">
       <label class="input-label">What's on your heart?</label>
-      <div class="textarea-wrap">
-        <textarea id="user-input" rows="4" placeholder="I'm struggling with exams and feeling overwhelmed... / I'm grateful for how far I've come this Ramadan... / I've been having anxiety lately and need peace..."></textarea>
-      </div>
+      <textarea id="user-input" rows="4" placeholder="I'm struggling with exams and feeling overwhelmed... / I don't know what's wrong with me lately... / I feel lost and need direction..."></textarea>
 
       <div class="suggestions">
-        <span class="suggestion" onclick="fillSuggestion(this)">😔 Heartbreak</span>
-        <span class="suggestion" onclick="fillSuggestion(this)">📚 Exams</span>
-        <span class="suggestion" onclick="fillSuggestion(this)">💼 Job search</span>
-        <span class="suggestion" onclick="fillSuggestion(this)">😰 Anxiety</span>
-        <span class="suggestion" onclick="fillSuggestion(this)">🙏 Gratitude</span>
-        <span class="suggestion" onclick="fillSuggestion(this)">👨‍👩‍👦 Family issues</span>
-        <span class="suggestion" onclick="fillSuggestion(this)">💊 Health</span>
-        <span class="suggestion" onclick="fillSuggestion(this)">😔 Feeling lost</span>
+        <span class="suggestion" onclick="fillSuggestion('heartbreak')">💔 Heartbreak</span>
+        <span class="suggestion" onclick="fillSuggestion('exams')">📚 Exams</span>
+        <span class="suggestion" onclick="fillSuggestion('job search')">💼 Job search</span>
+        <span class="suggestion" onclick="fillSuggestion('anxiety')">😰 Anxiety</span>
+        <span class="suggestion" onclick="fillSuggestion('gratitude')">🙏 Gratitude</span>
+        <span class="suggestion" onclick="fillSuggestion('family issues')">👨‍👩‍👦 Family issues</span>
+        <span class="suggestion" onclick="fillSuggestion('health')">💊 Health</span>
+        <span class="suggestion" onclick="fillSuggestion('feeling lost')">😔 Feeling lost</span>
+        <span class="suggestion" onclick="fillSuggestion('depression')">🌧️ Depression</span>
+        <span class="suggestion" onclick="fillSuggestion('loneliness')">🫂 Loneliness</span>
+        <span class="suggestion" onclick="fillSuggestion('debt and money problems')">💸 Debt</span>
+        <span class="suggestion" onclick="fillSuggestion('marriage')">💍 Marriage</span>
+        <span class="suggestion" onclick="fillSuggestion('grief and loss')">🕊️ Grief</span>
+        <span class="suggestion" onclick="fillSuggestion('purpose and direction in life')">🧭 Purpose</span>
+        <span class="suggestion" onclick="fillSuggestion('success and goals')">🏆 Success</span>
+        <span class="suggestion" onclick="fillSuggestion('forgiveness and guilt')">🤍 Forgiveness</span>
+        <span class="suggestion" onclick="fillSuggestion('travel and safety')">✈️ Travel</span>
+        <span class="suggestion" onclick="fillSuggestion('new baby and parenthood')">👶 New baby</span>
       </div>
 
       <button class="btn" id="generate-btn" onclick="generateDua()">🤲 Generate My Dua</button>
-      <div class="error-msg" id="error-msg">Something went wrong. Please try again in a moment.</div>
     </div>
 
-    <!-- Loading -->
     <div class="loading" id="loading">
-      <div class="loading-dots">
-        <span></span><span></span><span></span>
-      </div>
+      <div class="loading-dots"><span></span><span></span><span></span></div>
       <div class="loading-text">Finding the right words for your heart...</div>
     </div>
 
-    <!-- Result -->
     <div class="dua-result" id="dua-result">
       <div class="dua-card">
         <span class="dua-type" id="dua-type">DUA FOR YOUR MOMENT</span>
@@ -468,12 +485,23 @@
         <div class="personal-message" id="personal-message"></div>
       </div>
 
+      <div class="action-card">
+        <span class="action-label">✦ What to do now</span>
+        <ul class="action-list" id="action-list"></ul>
+      </div>
+
       <div class="source-note" id="source-note"></div>
 
       <div class="result-actions">
         <button class="btn-another" onclick="tryAnother()">🌙 Get another dua</button>
         <button class="btn-share-dua" onclick="shareDua()">📤 Share this dua</button>
+        <button class="btn-new" onclick="startFresh()">← Try a different situation</button>
       </div>
+    </div>
+
+    <div class="footer">
+      Made with love for the Ummah · Ramadan 1447H<br>
+      Abolade Lawal
     </div>
   </div>
 
@@ -483,102 +511,273 @@
     const DUAS_DB = [
       {
         id: "anxiety",
-        tags: ["anxiety", "stress", "overwhelmed", "worried", "fear", "panic", "nervous"],
+        tags: ["anxiety", "stress", "overwhelmed", "worried", "fear", "panic", "nervous", "restless", "overthinking", "what is wrong", "don't know", "something wrong", "not okay"],
         type: "DUA FOR ANXIETY & WORRY",
         arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَأَعُوذُ بِكَ مِنَ الْعَجْزِ وَالْكَسَلِ",
         transliteration: "Allahumma inni a'udhu bika minal-hammi wal-hazan, wa a'udhu bika minal-'ajzi wal-kasal",
         meaning: "O Allah, I seek refuge in You from grief and sadness, and I seek refuge in You from weakness and laziness.",
-        source: "Sahih Al-Bukhari"
+        source: "Sahih Al-Bukhari",
+        actions: [
+          "Make wudu before reciting this dua — purity prepares the heart",
+          "Recite after each obligatory prayer, especially Fajr and Maghrib",
+          "Place your hand on your chest as you recite — speak it to your own heart",
+          "Follow with dhikr: say 'Hasbunallahu wa ni'mal wakeel' 7 times"
+        ]
       },
       {
         id: "exam_knowledge",
-        tags: ["exams", "study", "knowledge", "school", "learning", "test", "results", "university"],
+        tags: ["exams", "study", "knowledge", "school", "learning", "test", "results", "university", "academia", "grades", "studying"],
         type: "DUA FOR KNOWLEDGE & CLARITY",
         arabic: "رَبِّ زِدْنِي عِلْمًا",
         transliteration: "Rabbi zidni 'ilma",
         meaning: "My Lord, increase me in knowledge.",
-        source: "Quran 20:114"
+        source: "Quran 20:114",
+        actions: [
+          "Recite this before every study session — make it your opening ritual",
+          "Perform 2 rakaat nafl prayer before important exams",
+          "Read Surah Al-Kahf on Fridays — it is known to illuminate the mind",
+          "Give a small sadaqah before your exam, even if just buying someone water"
+        ]
       },
       {
         id: "difficulty",
-        tags: ["hard time", "difficulty", "struggling", "pain", "hardship", "trouble", "stuck", "lost"],
+        tags: ["hard time", "difficulty", "struggling", "hardship", "trouble", "stuck", "nothing working", "giving up", "hopeless", "test", "trial", "challenge"],
         type: "DUA IN TIMES OF DIFFICULTY",
         arabic: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ",
         transliteration: "Hasbunallahu wa ni'mal-wakeel",
         meaning: "Allah is sufficient for us, and He is the best Disposer of Affairs.",
-        source: "Quran 3:173"
+        source: "Quran 3:173",
+        actions: [
+          "Repeat this phrase 100 times in one sitting — it is known to bring swift relief",
+          "Pray Salatul Hajah (prayer of need) — 2 rakaat specifically for your situation",
+          "Write down your worry, then fold the paper as a symbol of surrendering it to Allah",
+          "Fast a voluntary day if able — fasting sharpens duas in a special way"
+        ]
       },
       {
         id: "heartbreak",
-        tags: ["heartbreak", "heartbroken", "love", "relationship", "loss", "sad", "grief", "lonely", "loneliness"],
+        tags: ["heartbreak", "heartbroken", "love", "relationship", "loss", "sad", "grief", "lonely", "loneliness", "miss", "missing", "rejected", "breakup", "divorce"],
         type: "DUA FOR A HEALING HEART",
         arabic: "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ",
         transliteration: "Ya Hayyu Ya Qayyumu bi-rahmatika astagheeth",
         meaning: "O Ever-Living, O Sustainer, in Your mercy I seek relief.",
-        source: "Al-Mustadrak"
+        source: "Al-Mustadrak",
+        actions: [
+          "Recite this 40 times after Fajr — the early morning is when hearts are most open",
+          "Perform ghusl (full ritual bath) if you haven't — it spiritually cleanses grief",
+          "Cry in your sujood — the closest you are to Allah is in prostration",
+          "Read Surah Al-Inshirah (94) — it was revealed specifically for hearts in distress"
+        ]
       },
       {
         id: "job_rizq",
-        tags: ["job", "work", "money", "provision", "career", "unemployed", "rizq", "business", "finances", "financial"],
+        tags: ["job", "work", "money", "provision", "career", "unemployed", "rizq", "business", "finances", "financial", "salary", "income", "broke", "opportunity"],
         type: "DUA FOR PROVISION & WORK",
         arabic: "اللَّهُمَّ اكْفِنِي بِحَلاَلِكَ عَنْ حَرَامِكَ وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ",
         transliteration: "Allahumma-kfini bi-halalika 'an haramika wa aghnini bi-fadlika 'amman siwak",
         meaning: "O Allah, make what is lawful sufficient for me against what is unlawful, and enrich me by Your bounty, making me independent of all others.",
-        source: "Sunan Al-Tirmidhi"
+        source: "Sunan Al-Tirmidhi",
+        actions: [
+          "Recite this 3 times after Fajr — morning duas for rizq are especially powerful",
+          "Give sadaqah consistently, even in small amounts — it opens doors of provision",
+          "Read Surah Al-Waqiah every night before sleeping — it is connected to rizq",
+          "Make istighfar abundantly — it is linked to increase in provision in the Quran"
+        ]
       },
       {
         id: "gratitude",
-        tags: ["grateful", "gratitude", "thankful", "blessed", "alhamdulillah", "happy", "good things"],
+        tags: ["grateful", "gratitude", "thankful", "blessed", "alhamdulillah", "happy", "good things", "thankfulness", "appreciate"],
         type: "DUA OF GRATITUDE",
         arabic: "رَبِّ أَوْزِعْنِي أَنْ أَشْكُرَ نِعْمَتَكَ الَّتِي أَنْعَمْتَ عَلَيَّ",
         transliteration: "Rabbi awzi'ni an ashkura ni'mataka allati an'amta 'alayya",
         meaning: "My Lord, enable me to be grateful for Your favor which You have bestowed upon me.",
-        source: "Quran 27:19"
+        source: "Quran 27:19",
+        actions: [
+          "Write 3 specific blessings you're grateful for before reciting this dua",
+          "Pray 2 rakaat shukr (gratitude prayer) — it is a sunnah for moments of blessing",
+          "Share your blessing with someone — feeding another or giving a gift amplifies gratitude",
+          "Say Alhamdulillah 100 times today as a dedicated act of remembrance"
+        ]
       },
       {
         id: "health",
-        tags: ["health", "sick", "illness", "healing", "disease", "recovery", "hospital", "pain", "body"],
+        tags: ["health", "sick", "illness", "healing", "disease", "recovery", "hospital", "pain", "body", "unwell", "doctor", "surgery", "medication"],
         type: "DUA FOR HEALING",
         arabic: "اللَّهُمَّ رَبَّ النَّاسِ أَذْهِبِ الْبَأْسَ اشْفِهِ وَأَنْتَ الشَّافِي لاَ شِفَاءَ إِلاَّ شِفَاؤُكَ",
         transliteration: "Allahumma Rabb-an-naas, adh-hib il-ba's, washfihi wa Anta al-Shaafi, laa shifaa'a illa shifaa'uk",
-        meaning: "O Allah, Lord of mankind, remove the harm and heal him/her. You are the Healer. There is no healing except Your healing.",
-        source: "Sahih Al-Bukhari & Muslim"
+        meaning: "O Allah, Lord of mankind, remove the harm and heal. You are the Healer. There is no healing except Your healing.",
+        source: "Sahih Al-Bukhari & Muslim",
+        actions: [
+          "Recite Surah Al-Fatiha 7 times and blow on the area of pain — it is a prophetic remedy",
+          "Place your right hand on the area of pain while reciting this dua",
+          "Give sadaqah on behalf of the person who is ill — it is known to bring shifa",
+          "Recite Ayatul Kursi morning and evening for protection and healing"
+        ]
       },
       {
         id: "family",
-        tags: ["family", "parents", "mother", "father", "siblings", "children", "home", "marriage", "spouse"],
+        tags: ["family", "parents", "mother", "father", "siblings", "children", "home", "marriage", "spouse", "husband", "wife", "conflict", "relatives", "argument"],
         type: "DUA FOR FAMILY & LOVED ONES",
         arabic: "رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا",
         transliteration: "Rabbana hab lana min azwajina wa dhurriyyatina qurrata a'yunin waj'alna lil-muttaqina imama",
         meaning: "Our Lord, grant us from among our spouses and offspring comfort to our eyes, and make us a leader for the righteous.",
-        source: "Quran 25:74"
+        source: "Quran 25:74",
+        actions: [
+          "Make this dua after every Fajr and Maghrib — morning and evening duas for family carry extra weight",
+          "Recite it while thinking of each family member by name",
+          "Perform silat ar-rahm — call or visit a family member you've been distant from",
+          "Offer Salat al-Duha (morning prayer) specifically for your family's wellbeing"
+        ]
       },
       {
         id: "forgiveness",
-        tags: ["sin", "forgiveness", "guilt", "regret", "repentance", "mistake", "wrong", "tawbah", "ashamed"],
+        tags: ["sin", "forgiveness", "guilt", "regret", "repentance", "mistake", "wrong", "tawbah", "ashamed", "done something bad", "sinned"],
         type: "DUA FOR FORGIVENESS",
         arabic: "رَبَّنَا ظَلَمْنَا أَنفُسَنَا وَإِن لَّمْ تَغْفِرْ لَنَا وَتَرْحَمْنَا لَنَكُونَنَّ مِنَ الْخَاسِرِينَ",
         transliteration: "Rabbana zalamna anfusana wa-in lam taghfir lana wa-tarhamna lanakunanna minal-khasirin",
         meaning: "Our Lord, we have wronged ourselves, and if You do not forgive us and have mercy upon us, we will surely be among the losers.",
-        source: "Quran 7:23"
+        source: "Quran 7:23",
+        actions: [
+          "Make ghusl as an act of spiritual renewal before this dua",
+          "Pray 2 rakaat tawbah — the prayer of repentance — with full presence",
+          "Say Astaghfirullah 100 times in one sitting as dedicated istighfar",
+          "If your sin involved another person, make it right with them directly if possible"
+        ]
       },
       {
         id: "guidance",
-        tags: ["guidance", "confused", "decision", "direction", "path", "lost", "istikhara", "choice", "unsure"],
+        tags: ["guidance", "confused", "decision", "direction", "path", "lost", "istikhara", "choice", "unsure", "don't know what to do", "which way", "crossroads"],
         type: "DUA FOR GUIDANCE",
         arabic: "اللَّهُمَّ إِنِّي أَسْتَخِيرُكَ بِعِلْمِكَ وَأَسْتَقْدِرُكَ بِقُدْرَتِكَ",
         transliteration: "Allahumma inni astakhiruka bi 'ilmika, wa astaqdiruka bi qudratik",
         meaning: "O Allah, I seek Your guidance through Your knowledge, and I seek ability through Your power.",
-        source: "Sahih Al-Bukhari (Istikhara)"
+        source: "Sahih Al-Bukhari (Istikhara)",
+        actions: [
+          "Pray Salat al-Istikhara — 2 rakaat followed by this dua — for your specific decision",
+          "Sleep with wudu after istikhara and observe what your heart feels drawn toward",
+          "Consult someone wise and trustworthy — consultation is part of tawakkul",
+          "Recite Surah Al-Kahf this Friday — it contains deep wisdom for those seeking guidance"
+        ]
       },
       {
         id: "peace",
-        tags: ["peace", "calm", "restless", "sleep", "insomnia", "mind", "quiet", "tired", "burnout"],
+        tags: ["peace", "calm", "sleep", "insomnia", "mind", "quiet", "tired", "burnout", "restless", "can't sleep", "noisy mind"],
         type: "DUA FOR PEACE OF MIND",
         arabic: "أَلاَ بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
         transliteration: "Ala bidhikrillahi tatma'innu al-qulub",
         meaning: "Verily, in the remembrance of Allah do hearts find rest.",
-        source: "Quran 13:28"
+        source: "Quran 13:28",
+        actions: [
+          "Recite Ayatul Kursi before sleeping — it brings peace and protection through the night",
+          "Do 33 SubhanAllah, 33 Alhamdulillah, 34 Allahu Akbar before bed (Tasbih Fatimah)",
+          "Recite the last two verses of Surah Al-Baqarah (2:285-286) every evening",
+          "Take a short walk in nature, even 10 minutes — it calms both the nervous system and the soul"
+        ]
+      },
+      {
+        id: "depression",
+        tags: ["depression", "depressed", "hopeless", "empty", "numb", "dark place", "no motivation", "nothing matters", "don't care", "sad all the time", "not okay", "what is wrong with me", "something wrong with me"],
+        type: "DUA FOR LIGHT IN DARK TIMES",
+        arabic: "اللَّهُمَّ إِنِّي عَبْدُكَ، ابْنُ عَبْدِكَ، ابْنُ أَمَتِكَ، نَاصِيَتِي بِيَدِكَ",
+        transliteration: "Allahumma inni 'abduka, ibnu 'abdika, ibnu amatika, nasiyati bi-yadika",
+        meaning: "O Allah, I am Your servant, son of Your servant, son of Your maidservant. My forelock is in Your hand.",
+        source: "Musnad Ahmad",
+        actions: [
+          "Recite this dua in full every morning — it reminds your soul of its true belonging to Allah",
+          "Talk to someone you trust today — healing rarely happens alone",
+          "Step outside for even 5 minutes of sunlight — the body and soul are deeply connected",
+          "Make one small act of ibadah today no matter how small — even saying Bismillah before drinking water counts"
+        ]
+      },
+      {
+        id: "debt",
+        tags: ["debt", "loan", "owing", "owe money", "financial stress", "can't pay", "bills", "broke", "poverty", "no money"],
+        type: "DUA FOR RELIEF FROM DEBT",
+        arabic: "اللَّهُمَّ اكْفِنِي بِحَلاَلِكَ عَنْ حَرَامِكَ وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ",
+        transliteration: "Allahumma-kfini bi-halalika 'an haramika wa aghnini bi-fadlika 'amman siwak",
+        meaning: "O Allah, make what is lawful sufficient for me against what is unlawful, and enrich me by Your bounty, making me independent of all others.",
+        source: "Sunan Al-Tirmidhi",
+        actions: [
+          "Read Surah Al-Waqiah every night — it is narrated to protect from poverty",
+          "Give even the smallest sadaqah regularly — it opens rizq in ways we cannot see",
+          "Make a structured plan for your debt — tawakkul includes taking practical steps",
+          "Say 'Ya Razzaq' 100 times after Fajr — it is one of Allah's names specifically for provision"
+        ]
+      },
+      {
+        id: "purpose",
+        tags: ["purpose", "meaning", "direction", "what am i doing", "no purpose", "empty life", "why am i here", "lost my way", "don't know my path", "career direction"],
+        type: "DUA FOR PURPOSE & DIRECTION",
+        arabic: "رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي",
+        transliteration: "Rabbi-shrah li sadri wa yassir li amri",
+        meaning: "My Lord, expand my chest and ease my affair for me.",
+        source: "Quran 20:25-26",
+        actions: [
+          "Recite this before every important meeting, decision or new beginning",
+          "Sit in silence for 10 minutes after Fajr — before the world wakes up, ask yourself what you truly want",
+          "Write down 3 things you were made for — your skills, your passions, what makes you lose track of time",
+          "Pray Salat al-Istikhara for your life direction — Allah answers sincerely made istikhara"
+        ]
+      },
+      {
+        id: "grief",
+        tags: ["grief", "loss", "bereavement", "death", "died", "passed away", "mourning", "someone died", "lost someone", "inna lillahi"],
+        type: "DUA FOR GRIEF & LOSS",
+        arabic: "إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ، اللَّهُمَّ أْجُرْنِي فِي مُصِيبَتِي وَأَخْلِفْ لِي خَيْرًا مِنْهَا",
+        transliteration: "Inna lillahi wa inna ilayhi raji'un. Allahumma-jurni fi musibati wa akhlif li khayran minha",
+        meaning: "Indeed we belong to Allah and to Him we return. O Allah, reward me in my affliction and replace it with something better.",
+        source: "Sahih Muslim",
+        actions: [
+          "Say Inna lillahi wa inna ilayhi raji'un as many times as you need — there is no limit",
+          "Allow yourself to grieve — Islam does not ask you to suppress tears",
+          "Make dua for the deceased after every prayer this week",
+          "Do sadaqah jariyah in their name — it reaches them and comforts you simultaneously"
+        ]
+      },
+      {
+        id: "marriage",
+        tags: ["marriage", "spouse", "husband", "wife", "nikah", "wedding", "partner", "relationship", "want to get married", "finding a spouse"],
+        type: "DUA FOR MARRIAGE & COMPANIONSHIP",
+        arabic: "رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ",
+        transliteration: "Rabbana hab lana min azwajina wa dhurriyyatina qurrata a'yunin",
+        meaning: "Our Lord, grant us from among our spouses and offspring comfort to our eyes.",
+        source: "Quran 25:74",
+        actions: [
+          "Recite this after every Fajr and Maghrib — consistency opens doors",
+          "Pray 2 rakaat and describe to Allah exactly what you need in a spouse",
+          "Work on your own character while waiting — the best spouses attract the best spouses",
+          "Ask righteous family or friends to make dua for you — collective duas carry weight"
+        ]
+      },
+      {
+        id: "travel",
+        tags: ["travel", "journey", "trip", "flight", "road", "safety", "going somewhere", "relocating", "moving"],
+        type: "DUA FOR TRAVEL & SAFETY",
+        arabic: "سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَى رَبِّنَا لَمُنقَلِبُونَ",
+        transliteration: "Subhana-lladhi sakh-khara lana hadha wa ma kunna lahu muqrinin, wa inna ila Rabbina lamunqalibun",
+        meaning: "Glory be to Him who has subjected this to us, and we could not have subdued it ourselves. And indeed, to our Lord we will return.",
+        source: "Quran 43:13-14",
+        actions: [
+          "Recite this dua as you board any vehicle — it is the Prophetic travel dua",
+          "Pray 2 rakaat before departing on any significant journey",
+          "Give sadaqah before traveling — it is narrated to protect from harm on the road",
+          "Read Ayatul Kursi before sleeping away from home for protection"
+        ]
+      },
+      {
+        id: "new_baby",
+        tags: ["baby", "pregnant", "newborn", "new baby", "child", "parenthood", "expecting", "birth", "infant"],
+        type: "DUA FOR A NEW LIFE",
+        arabic: "أُعِيذُكَ بِكَلِمَاتِ اللَّهِ التَّامَّةِ مِنْ كُلِّ شَيْطَانٍ وَهَامَّةٍ وَمِنْ كُلِّ عَيْنٍ لَامَّةٍ",
+        transliteration: "U'idhu-ka bi-kalimatillahi at-tammati min kulli shaytanin wa hammatin wa min kulli 'aynin lammah",
+        meaning: "I seek protection for you in the perfect words of Allah from every devil, every harmful creature, and every evil eye.",
+        source: "Sahih Al-Bukhari",
+        actions: [
+          "Recite this over your baby morning and evening — it is a Prophetic protection dua for children",
+          "Perform the aqiqah (sacrifice) when able — it is a right of the child",
+          "Begin the adhan softly in the baby's right ear — it is the first word of Allah they hear",
+          "Make consistent dua for your child's righteousness — the dua of a parent is never rejected"
+        ]
       },
       {
         id: "general",
@@ -587,16 +786,44 @@
         arabic: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
         transliteration: "Rabbana atina fid-dunya hasanatan wa fil-akhirati hasanatan wa qina 'adhaban-nar",
         meaning: "Our Lord, give us good in this world and good in the Hereafter, and protect us from the punishment of the Fire.",
-        source: "Quran 2:201"
+        source: "Quran 2:201",
+        actions: [
+          "Recite this dua after every obligatory prayer — the Prophet ﷺ made it constantly",
+          "Make wudu and sit in a clean, quiet space before your dua",
+          "Raise your hands and begin with salawat upon the Prophet ﷺ",
+          "End your dua session with istighfar — it seals your prayers beautifully"
+        ]
       }
     ];
+
+    // Per-dua fallback messages (used when API fails)
+    const FALLBACK_MESSAGES = {
+      anxiety: "Whatever is tightening in your chest right now — Allah knows it before you name it. This dua was made for exactly this kind of heaviness. Let it be your anchor today.",
+      exam_knowledge: "The fact that you're seeking and preparing is already half the answer. Allah loves effort paired with dua. Recite this before you open your books and watch what opens up.",
+      difficulty: "Every prophet was tested. Every believer is tested. The test itself is proof you are considered worthy of growing. This dua carried Ibrahim, carried Musa — let it carry you.",
+      heartbreak: "A heart in pain is still a beating heart. Still a heart that feels, that seeks, that hopes. That's not weakness — that's the beginning of healing. Let this dua hold you tonight.",
+      job_rizq: "Your rizq is already written. What you're doing right now — seeking, making dua — is part of the path to it. Don't let the wait shake you. The door is about to open.",
+      gratitude: "That you're pausing to acknowledge blessings says everything about your heart. This dua will only multiply what you have. Keep counting, keep thanking.",
+      health: "Allah is Ash-Shafi — The Healer. Not one of the healers. The Healer. Make this dua with that certainty and let nothing else compete with it.",
+      family: "The people who matter most are worth every dua you make for them. They may not know you're praying for them, but Allah does — and He is already responding.",
+      forgiveness: "The fact that you feel the weight of a mistake is proof your heart is alive and aware. That awareness is itself the beginning of tawbah. Now let this dua complete it.",
+      guidance: "Being lost enough to ask for direction is the first step to finding it. Allah guided prophets through far greater confusion. He will guide you too.",
+      peace: "A quiet mind is not the absence of thoughts — it is knowing that Allah holds every worry you lay down. Lay them all down with this dua and rest.",
+      depression: "You showed up. You typed these words. You're still here. That is enough for today. Allah sees every single step, even the ones that feel too small to count.",
+      debt: "Provision is from Allah alone and He has never abandoned those who trust Him. This dua has opened doors for countless believers before you. Let it open yours.",
+      purpose: "You were not created without purpose — that is impossible. Sometimes we just need to get quiet enough to hear what we were made for. This dua creates that space.",
+      grief: "Grief means you loved. That love is not lost — it is transformed. Say this dua and know that those you've lost are held in Allah's mercy.",
+      marriage: "The right person at the right time — that is what Allah's plan looks like. Make this dua consistently and trust the timing, even when it tests you.",
+      travel: "Every journey taken in trust is a journey taken with Allah. This dua was taught by the Prophet ﷺ himself — it carries the full weight of prophetic protection.",
+      new_baby: "A new soul has entered this world through your family. This dua is one of the most beautiful gifts you can give — protection wrapped in the words of the Prophet ﷺ.",
+      general: "Whatever brought you here today, it was not an accident. Allah is already aware, already responding. This dua meets you exactly where you are."
+    };
 
     let lastDuaId = null;
     let currentDuaText = '';
 
-    function fillSuggestion(el) {
-      const text = el.textContent.replace(/^[^\s]+\s/, '');
-      document.getElementById('user-input').value = `I'm going through ${text.toLowerCase()} right now`;
+    function fillSuggestion(topic) {
+      document.getElementById('user-input').value = `I'm going through ${topic} right now and need guidance`;
       document.getElementById('user-input').focus();
     }
 
@@ -620,8 +847,15 @@
       }
 
       if (!bestMatch) {
-        const fallbacks = DUAS_DB.filter(d => d.id !== lastDuaId);
-        bestMatch = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+        const nonGeneral = DUAS_DB.filter(d => d.id !== 'general' && d.id !== lastDuaId);
+        const emotional = ["what is wrong", "don't know", "not okay", "feel", "help me", "lost", "confused", "something wrong"];
+        const isEmotional = emotional.some(e => lower.includes(e));
+        if (isEmotional) {
+          const candidates = nonGeneral.filter(d => ['anxiety', 'peace', 'difficulty', 'depression'].includes(d.id));
+          bestMatch = candidates[Math.floor(Math.random() * candidates.length)] || nonGeneral[0];
+        } else {
+          bestMatch = DUAS_DB.find(d => d.id === 'general');
+        }
       }
 
       return bestMatch;
@@ -634,8 +868,6 @@
         return;
       }
 
-      // Hide error, show loading
-      document.getElementById('error-msg').classList.remove('show');
       document.getElementById('input-section').style.display = 'none';
       document.getElementById('dua-result').classList.remove('show');
       document.getElementById('loading').classList.add('show');
@@ -657,16 +889,9 @@
 
         if (!response.ok) throw new Error('API error');
         const data = await response.json();
-
         displayDua(matchedDua, data.message);
       } catch (err) {
-        // Fallback personal message if API fails
-        const fallbackMessages = [
-          `Whatever you're carrying right now, you don't have to carry it alone. Allah sees you — not just your actions, but your intentions, your struggles, the weight you wake up with every morning. This dua has been a source of strength for countless believers before you. Make it yours today.`,
-          `There's something beautiful about the fact that you're here, seeking. That alone is a sign of a heart that hasn't given up. Recite this dua with presence — even if the Arabic feels unfamiliar, your sincerity is what reaches Him.`,
-          `This Ramadan, whatever you're going through, remember that difficulty and closeness to Allah often come together. The most broken hearts have made the most powerful duas. Yours counts.`
-        ];
-        const msg = fallbackMessages[Math.floor(Math.random() * fallbackMessages.length)];
+        const msg = FALLBACK_MESSAGES[matchedDua.id] || FALLBACK_MESSAGES.general;
         displayDua(matchedDua, msg);
       }
     }
@@ -681,10 +906,18 @@
       document.getElementById('personal-message').textContent = personalMessage;
       document.getElementById('source-note').textContent = '— ' + dua.source;
 
-currentDuaText = `${dua.type}\n\n${dua.arabic}\n\n${dua.transliteration}\n\n"${dua.meaning}"\n\n— ${dua.source}\n\nFind your personal dua at noor-seven-lac.vercel.app · Ramadan 1447H`;
+      const actionList = document.getElementById('action-list');
+      actionList.innerHTML = '';
+      (dua.actions || []).forEach(action => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="action-dot"></span><span>${action}</span>`;
+        actionList.appendChild(li);
+      });
+
+      currentDuaText = `${dua.type}\n\n${dua.arabic}\n\n${dua.transliteration}\n\n"${dua.meaning}"\n\n— ${dua.source}\n\nGet your personal dua → https://noor-seven-lac.vercel.app?ref=share · Ramadan 1447H`;
+
       document.getElementById('dua-result').classList.add('show');
 
-      // Animate in
       const card = document.querySelector('.dua-card');
       card.style.opacity = '0';
       card.style.transform = 'translateY(20px)';
@@ -700,26 +933,33 @@ currentDuaText = `${dua.type}\n\n${dua.arabic}\n\n${dua.transliteration}\n\n"${d
       document.getElementById('dua-result').classList.remove('show');
       document.getElementById('loading').classList.add('show');
 
-      setTimeout(() => {
-        const matchedDua = matchDua(input + ' ' + Math.random()); // slight variation to avoid same match
-        lastDuaId = matchedDua.id;
+      const matchedDua = matchDua(input);
+      lastDuaId = matchedDua.id;
 
-        fetch('/api/dua', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            userSituation: input,
-            duaArabic: matchedDua.arabic,
-            duaMeaning: matchedDua.meaning,
-            duaType: matchedDua.type
-          })
+      fetch('/api/dua', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userSituation: input,
+          duaArabic: matchedDua.arabic,
+          duaMeaning: matchedDua.meaning,
+          duaType: matchedDua.type
         })
-        .then(r => r.json())
-        .then(data => displayDua(matchedDua, data.message))
-        .catch(() => {
-          displayDua(matchedDua, "Every dua you make in Ramadan carries extra weight. Keep going.");
-        });
-      }, 500);
+      })
+      .then(r => r.json())
+      .then(data => displayDua(matchedDua, data.message))
+      .catch(() => {
+        const msg = FALLBACK_MESSAGES[matchedDua.id] || FALLBACK_MESSAGES.general;
+        displayDua(matchedDua, msg);
+      });
+    }
+
+    function startFresh() {
+      document.getElementById('dua-result').classList.remove('show');
+      document.getElementById('input-section').style.display = 'block';
+      document.getElementById('user-input').value = '';
+      lastDuaId = null;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     async function shareDua() {
