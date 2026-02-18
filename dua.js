@@ -851,7 +851,7 @@
       general: "Whatever brought you here today, it was not an accident. Allah is already aware, already responding. This dua meets you exactly where you are."
     };
 
-    let lastDuaId = null;
+    
     let currentDuaText = '';
 
     const MAX_CHIPS = 3;
@@ -904,6 +904,8 @@
       return typed;
     }
 
+    let shownDuaIds = [];
+
     function matchDua(input) {
       const lower = input.toLowerCase();
       let bestScore = 0;
@@ -911,7 +913,7 @@
 
       for (const dua of DUAS_DB) {
         if (dua.id === 'general') continue;
-        if (dua.id === lastDuaId) continue;
+        if (shownDuaIds.includes(dua.id)) continue;
 
         let score = 0;
         for (const tag of dua.tags) {
@@ -925,19 +927,28 @@
         }
       }
 
-      // Break ties randomly so same input doesn't always return same dua
       if (candidates.length > 0) {
         return candidates[Math.floor(Math.random() * candidates.length)];
       }
 
-      const nonGeneral = DUAS_DB.filter(d => d.id !== 'general' && d.id !== lastDuaId);
-      const emotional = ["what is wrong", "don't know", "not okay", "feel", "help me", "lost", "confused", "something wrong"];
-      const isEmotional = emotional.some(e => lower.includes(e));
-      if (isEmotional) {
-        const emo = nonGeneral.filter(d => ['anxiety', 'peace', 'difficulty', 'depression'].includes(d.id));
-        return emo[Math.floor(Math.random() * emo.length)] || nonGeneral[0];
+      // No unshown match — try any non-general unshown dua
+      const unshown = DUAS_DB.filter(d => d.id !== 'general' && !shownDuaIds.includes(d.id));
+      if (unshown.length) {
+        // Prefer emotionally relevant ones first
+        const emotional = ["what is wrong", "don't know", "not okay", "feel", "help me", "lost", "confused", "something wrong", "depression", "anxiety", "grief", "heartbreak"];
+        const isEmotional = emotional.some(e => lower.includes(e));
+        if (isEmotional) {
+          const emo = unshown.filter(d => ['anxiety', 'peace', 'difficulty', 'depression', 'heartbreak', 'grief'].includes(d.id));
+          if (emo.length) return emo[Math.floor(Math.random() * emo.length)];
+        }
+        return unshown[Math.floor(Math.random() * unshown.length)];
       }
-      return DUAS_DB.find(d => d.id === 'general');
+
+      // All duas shown — reset and start over (excluding the very last one shown)
+      const lastId = shownDuaIds[shownDuaIds.length - 1];
+      shownDuaIds = [];
+      const reset = DUAS_DB.filter(d => d.id !== 'general' && d.id !== lastId);
+      return reset[Math.floor(Math.random() * reset.length)];
     }
 
     async function generateDua() {
@@ -952,7 +963,7 @@
       document.getElementById('loading').classList.add('show');
 
       const matchedDua = matchDua(input);
-      lastDuaId = matchedDua.id;
+      shownDuaIds.push(matchedDua.id);
 
       try {
         const response = await fetch('/api/dua', {
@@ -1013,7 +1024,7 @@
       document.getElementById('loading').classList.add('show');
 
       const matchedDua = matchDua(input);
-      lastDuaId = matchedDua.id;
+      shownDuaIds.push(matchedDua.id);
 
       fetch('/api/dua', {
         method: 'POST',
@@ -1037,7 +1048,7 @@
       document.getElementById('dua-result').classList.remove('show');
       document.getElementById('input-section').style.display = 'block';
       document.getElementById('user-input').value = '';
-      lastDuaId = null;
+      shownDuaIds = [];
       // Reset chips
       selectedChips = [];
       document.querySelectorAll('.suggestion').forEach(s => s.classList.remove('selected', 'disabled'));
