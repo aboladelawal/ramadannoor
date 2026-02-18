@@ -7,7 +7,7 @@
   <meta property="og:title" content="Ramadan Real Talk Bingo 😅">
 <meta property="og:description" content="How is Ramadan REALLY going for you? Tap what applies. Get your title. Share with friends.">
 <meta property="og:image" content="https://raw.githubusercontent.com/aboladelawal/noor/main/og-bingo.png">
-<meta property="og:url" content="https://noor.vercel.app/bingo">
+<meta property="og:url" content="https://noor-seven-lac.vercel.app/bingo">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://raw.githubusercontent.com/aboladelawal/noor/main/og-bingo.png">
@@ -547,8 +547,7 @@
     async function shareResult() {
       const count = selected.size;
       const result = RESULTS.find(r => count >= r.min && count <= r.max) || RESULTS[RESULTS.length - 1];
-      const text = `I scored ${count}/15 on the Ramadan Real Talk Bingo 🌙\n\nMy title: "${result.title}"\n\nWhat's yours? → noor.vercel.app\n\n#Ramadan #NoorApp`;
-
+      const text = `I scored ${count}/15 on the Ramadan Real Talk Bingo 🌙\n\nMy title: "${result.title}"\n\nWhat's yours? → noor-seven-lac.vercel.app\n\n#Ramadan #NoorApp`;
       try {
         if (navigator.share) {
           await navigator.share({ text });
