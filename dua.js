@@ -175,6 +175,7 @@
     .suggestion.disabled {
       opacity: 0.3;
       cursor: not-allowed;
+      pointer-events: none;
     }
 
     .chip-hint {
@@ -465,6 +466,7 @@
       <h1>Ya Allah...</h1>
       <div class="header-arabic">يا الله</div>
       <p>Tell Him what's on your heart today. He already knows, but He loves to hear it from you.</p>
+      <div id="dua-greeting" style="font-size:13px; color:var(--gold-dim); font-style:italic; margin-top:8px; min-height:18px;"></div>
     </div>
 
     <div class="input-section" id="input-section">
@@ -856,6 +858,9 @@
     let selectedChips = [];
 
     function toggleSuggestion(el, topic) {
+      // Block if disabled
+      if (el.classList.contains('disabled')) return;
+
       const isSelected = el.classList.contains('selected');
       const hint = document.getElementById('chip-hint');
 
@@ -863,10 +868,14 @@
         // Deselect
         el.classList.remove('selected');
         selectedChips = selectedChips.filter(t => t !== topic);
-        // Re-enable all disabled chips
-        document.querySelectorAll('.suggestion.disabled').forEach(s => s.classList.remove('disabled'));
+        // Re-enable all chips (will re-disable if still at max)
+        document.querySelectorAll('.suggestion').forEach(s => s.classList.remove('disabled'));
+        // If still 3 selected somehow, re-disable unselected
+        if (selectedChips.length >= MAX_CHIPS) {
+          document.querySelectorAll('.suggestion:not(.selected)').forEach(s => s.classList.add('disabled'));
+        }
         hint.textContent = selectedChips.length > 0
-          ? `${selectedChips.length}/3 selected — tap to deselect`
+          ? `${selectedChips.length}/3 selected — tap again to remove`
           : 'Select up to 3 topics, or type your own above';
         hint.classList.remove('limit');
       } else {
@@ -874,9 +883,8 @@
         el.classList.add('selected');
         selectedChips.push(topic);
         if (selectedChips.length === MAX_CHIPS) {
-          // Disable unselected chips
           document.querySelectorAll('.suggestion:not(.selected)').forEach(s => s.classList.add('disabled'));
-          hint.textContent = 'Maximum 3 selected ✓';
+          hint.textContent = 'Maximum 3 selected ✓ — tap a chip to remove it';
           hint.classList.add('limit');
         } else {
           hint.textContent = `${selectedChips.length}/3 selected`;
@@ -898,8 +906,8 @@
 
     function matchDua(input) {
       const lower = input.toLowerCase();
-      let bestMatch = null;
       let bestScore = 0;
+      let candidates = [];
 
       for (const dua of DUAS_DB) {
         if (dua.id === 'general') continue;
@@ -911,23 +919,25 @@
         }
         if (score > bestScore) {
           bestScore = score;
-          bestMatch = dua;
+          candidates = [dua];
+        } else if (score === bestScore && score > 0) {
+          candidates.push(dua);
         }
       }
 
-      if (!bestMatch) {
-        const nonGeneral = DUAS_DB.filter(d => d.id !== 'general' && d.id !== lastDuaId);
-        const emotional = ["what is wrong", "don't know", "not okay", "feel", "help me", "lost", "confused", "something wrong"];
-        const isEmotional = emotional.some(e => lower.includes(e));
-        if (isEmotional) {
-          const candidates = nonGeneral.filter(d => ['anxiety', 'peace', 'difficulty', 'depression'].includes(d.id));
-          bestMatch = candidates[Math.floor(Math.random() * candidates.length)] || nonGeneral[0];
-        } else {
-          bestMatch = DUAS_DB.find(d => d.id === 'general');
-        }
+      // Break ties randomly so same input doesn't always return same dua
+      if (candidates.length > 0) {
+        return candidates[Math.floor(Math.random() * candidates.length)];
       }
 
-      return bestMatch;
+      const nonGeneral = DUAS_DB.filter(d => d.id !== 'general' && d.id !== lastDuaId);
+      const emotional = ["what is wrong", "don't know", "not okay", "feel", "help me", "lost", "confused", "something wrong"];
+      const isEmotional = emotional.some(e => lower.includes(e));
+      if (isEmotional) {
+        const emo = nonGeneral.filter(d => ['anxiety', 'peace', 'difficulty', 'depression'].includes(d.id));
+        return emo[Math.floor(Math.random() * emo.length)] || nonGeneral[0];
+      }
+      return DUAS_DB.find(d => d.id === 'general');
     }
 
     async function generateDua() {
@@ -998,7 +1008,7 @@
     }
 
     function tryAnother() {
-      const input = document.getElementById('user-input').value;
+      const input = buildInput() || document.getElementById('user-input').value;
       document.getElementById('dua-result').classList.remove('show');
       document.getElementById('loading').classList.add('show');
 
@@ -1048,6 +1058,13 @@
           setTimeout(() => toast.classList.remove('show'), 3000);
         }
       } catch {}
+    }
+
+    // Name greeting
+    const _name = localStorage.getItem('noor_name');
+    if (_name) {
+      const el = document.getElementById('dua-greeting');
+      if (el) el.textContent = `What's on your heart today, ${_name}?`;
     }
   </script>
 </body>
