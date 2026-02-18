@@ -79,7 +79,13 @@
     .card-bingo { background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(180,120,40,0.05)); }
     .card-iftar { background: linear-gradient(135deg, rgba(180,80,20,0.1), rgba(201,168,76,0.04)); }
     .card-deeds { background: linear-gradient(135deg, rgba(40,120,80,0.1), rgba(201,168,76,0.04)); }
-    .footer { margin-top: 48px; margin-bottom: 24px; text-align: center; font-size: 12px; color: var(--text-dim); font-weight: 300; letter-spacing: 1px; line-height: 1.8; }
+    .footer { margin-top: 48px; margin-bottom: 32px; text-align: center; font-size: 12px; color: var(--text-dim); font-weight: 300; letter-spacing: 1px; line-height: 1.8; }
+    .footer-name { color: var(--gold-dim); margin-bottom: 14px; }
+    .footer-links { display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 12px; }
+    .footer-link { display: flex; flex-direction: column; align-items: center; gap: 5px; text-decoration: none; color: var(--text-dim); transition: color 0.2s; }
+    .footer-link:hover { color: var(--gold); }
+    .footer-link-icon { font-size: 20px; }
+    .footer-link-label { font-size: 10px; letter-spacing: 1px; }
 
     /* Overlays */
     .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; align-items: center; justify-content: center; padding: 24px; }
@@ -133,7 +139,23 @@
         <div class="card-desc">Tap what you've done today.</div>
       </a>
     </div>
-    <div class="footer">Made with love for the Ummah &nbsp;·&nbsp; Ramadan 1447H<br>Abolade Lawal</div>
+    <div class="footer">
+      <div class="footer-name">Made with love for the Ummah &nbsp;·&nbsp; Ramadan 1447H<br>Abolade Lawal</div>
+      <div class="footer-links">
+        <a class="footer-link" href="https://instagram.com/__kingmufasa_" target="_blank" rel="noopener">
+          <span class="footer-link-icon">📸</span>
+          <span class="footer-link-label">Instagram</span>
+        </a>
+        <a class="footer-link" href="https://x.com/__kingmufasa_" target="_blank" rel="noopener">
+          <span class="footer-link-icon">𝕏</span>
+          <span class="footer-link-label">Twitter / X</span>
+        </a>
+        <a class="footer-link" href="https://wa.me/2347037135181" target="_blank" rel="noopener">
+          <span class="footer-link-icon">💬</span>
+          <span class="footer-link-label">WhatsApp</span>
+        </a>
+      </div>
+    </div>
   </div>
 
   <!-- FIRST VISIT: one-time name prompt -->
