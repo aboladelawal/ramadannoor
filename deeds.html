@@ -148,6 +148,30 @@
       transition: opacity 0.6s ease;
     }
     .affirmation.show { opacity: 1; }
+    /* Past day modal */
+    .past-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 200; overflow-y: auto; padding: 24px 20px 60px; }
+    .past-modal-inner { max-width: 480px; margin: 0 auto; }
+    .past-modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+    .past-modal-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--gold-light); }
+    .past-modal-close { background: none; border: 1px solid rgba(201,168,76,0.25); border-radius: 10px; color: var(--gold-dim); padding: 8px 14px; cursor: pointer; font-family: 'Tajawal', sans-serif; font-size: 13px; transition: all 0.2s; }
+    .past-modal-close:hover { border-color: var(--gold); color: var(--gold); }
+    .past-modal-stars { text-align: center; font-size: 24px; letter-spacing: 4px; margin-bottom: 6px; }
+    .past-modal-count { text-align: center; font-size: 13px; color: var(--text-dim); margin-bottom: 24px; }
+    .past-deed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    .past-deed-item { background: rgba(255,255,255,0.02); border: 1px solid rgba(201,168,76,0.08); border-radius: 14px; padding: 14px 12px; opacity: 0.4; }
+    .past-deed-item.done { background: rgba(201,168,76,0.1); border-color: rgba(201,168,76,0.3); opacity: 1; }
+    .past-deed-item.done::after { content: '✓'; position: absolute; top: 8px; right: 10px; font-size: 11px; color: var(--gold); }
+    .past-deed-item { position: relative; }
+    .past-deed-emoji { font-size: 20px; margin-bottom: 6px; display: block; }
+    .past-deed-name { font-size: 12px; color: var(--text); line-height: 1.3; }
+    .past-deed-item.done .past-deed-name { color: var(--gold-light); }
+    .past-cat-label { font-size: 10px; letter-spacing: 3px; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 10px; margin-top: 4px; padding-left: 2px; }
+    .past-empty-msg { text-align: center; padding: 40px 20px; color: var(--text-dim); font-size: 14px; font-style: italic; }
+    .cal-day.has-deeds { cursor: pointer; }
+    .cal-day.has-deeds:hover { border-color: rgba(201,168,76,0.5); background: rgba(201,168,76,0.2); }
+    .cal-day.past-empty { cursor: pointer; }
+    .cal-day.past-empty:hover { border-color: rgba(201,168,76,0.25); background: rgba(255,255,255,0.05); }
+    .cal-day.today { cursor: pointer; }
   </style>
 </head>
 <body>
@@ -201,6 +225,19 @@
         <span onclick="clearTodayDeeds()" style="font-size:10px;color:var(--gold-dim);cursor:pointer;text-decoration:underline;letter-spacing:0;">reset today</span>
       </div>
       <div class="calendar-strip" id="calendar-strip"></div>
+    </div>
+  </div>
+
+  <!-- Past day read-only modal -->
+  <div class="past-modal" id="past-modal">
+    <div class="past-modal-inner">
+      <div class="past-modal-header">
+        <div class="past-modal-title" id="modal-title">Day 1</div>
+        <button class="past-modal-close" onclick="closePastModal()">✕ Close</button>
+      </div>
+      <div class="past-modal-stars" id="modal-stars"></div>
+      <div class="past-modal-count" id="modal-count"></div>
+      <div id="modal-body"></div>
     </div>
   </div>
 
@@ -421,6 +458,7 @@
     }
 
     function renderDeeds() {
+      done = getTodayDeeds(); // always read fresh
       const container = document.getElementById('deeds-container');
       container.innerHTML = CATEGORIES.map(cat => `
         <div class="category">
@@ -466,12 +504,13 @@
         const isTod  = day === today;
         const isFut  = day > today;
         let cls = isTod ? 'today' : isPast ? (count > 0 ? 'has-deeds' : 'past-empty') : 'future';
-        return `<div class="cal-day ${cls}">
+        const clickable = !isFut ? `onclick="openPastDay(${day})"` : '';
+        return `<div class="cal-day ${cls}" ${clickable}>
           <span class="cal-num">${day}</span>
           ${(isTod || (isPast && count > 0)) ? '<span class="cal-dot"></span>' : ''}
         </div>`;
       }).join('');
-      // Scroll to today only on first load, not on every deed tap
+      // Scroll to today only on first load
       if (!window._calendarScrolled) {
         const todayEl = strip.children[today - 1];
         if (todayEl) todayEl.scrollIntoView({ inline: 'center', behavior: 'smooth' });
@@ -485,9 +524,56 @@
       done = {};
       prevStars = 0;
       document.getElementById('completion-msg').classList.remove('show');
+      document.getElementById('affirmation').classList.remove('show');
+      // Reset stars display
+      for (let i = 1; i <= 5; i++) {
+        document.getElementById(`star-${i}`).classList.remove('lit', 'just-lit');
+      }
+      document.getElementById('score-label').textContent = 'What have you done today?';
       renderDeeds();
       updateScore(null);
       renderCalendar();
+    }
+
+    // ── Past day modal ────────────────────────────────────────────
+    function openPastDay(ramadanDay) {
+      const today = getRamadanDay();
+      const d = new Date(RAMADAN_START);
+      d.setDate(d.getDate() + ramadanDay - 1);
+      const key = `noor_deeds_${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const raw = localStorage.getItem(key);
+      const dayDone = raw ? JSON.parse(raw) : {};
+      const count = Object.values(dayDone).filter(Boolean).length;
+      const stars = getStars(count);
+      const totalDeeds = CATEGORIES.reduce((s,c) => s + c.deeds.length, 0);
+      const isToday = ramadanDay === today;
+
+      document.getElementById('modal-title').textContent = isToday ? `Today — Day ${ramadanDay}` : `Ramadan Day ${ramadanDay}`;
+      document.getElementById('modal-stars').textContent = '★'.repeat(stars) + '☆'.repeat(5 - stars);
+      document.getElementById('modal-stars').style.color = stars > 0 ? 'var(--gold)' : 'var(--text-dim)';
+      document.getElementById('modal-count').textContent = count === 0
+        ? 'No deeds recorded yet'
+        : `${count} of ${totalDeeds} deeds completed`;
+
+      document.getElementById('modal-body').innerHTML = CATEGORIES.map(cat => `
+        <div class="past-cat-label">${cat.label}</div>
+        <div class="past-deed-grid">
+          ${cat.deeds.map(deed => `
+            <div class="past-deed-item ${dayDone[deed.id] ? 'done' : ''}">
+              <span class="past-deed-emoji">${deed.emoji}</span>
+              <div class="past-deed-name">${deed.name}</div>
+            </div>
+          `).join('')}
+        </div>
+      `).join('');
+
+      document.getElementById('past-modal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePastModal() {
+      document.getElementById('past-modal').style.display = 'none';
+      document.body.style.overflow = '';
     }
 
     // ── Init ──────────────────────────────────────────────────────
