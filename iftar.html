@@ -155,17 +155,13 @@
     <!-- Location prompt -->
     <div id="location-prompt" class="location-prompt">
       <div class="loc-icon">📍</div>
-      <div class="loc-title">Where are you fasting?</div>
-      <div class="loc-sub">Enter your city for accurate Suhoor and Iftar times.<br>Saved automatically — only asked once.</div>
-      <div class="city-input-wrap" id="city-input-wrap" style="display:block;">
-        <input id="city-input" type="text" placeholder="e.g. Lagos, London, Dubai..." onkeydown="if(event.key==='Enter') lookupCity()">
-        <button onclick="lookupCity()">Get My Times ✦</button>
-      </div>
-      <div class="loc-manual" style="margin-top:14px;">or <a onclick="requestLocation()">use GPS automatically 📍</a></div>
+      <div class="loc-title">Enable Location</div>
+      <div class="loc-sub">We need your location to calculate your exact Suhoor and Iftar times.<br>Saved automatically — only asked once.</div>
+      <button class="loc-btn" onclick="requestLocation()">Allow Location 📍</button>
     </div>
 
     <!-- Loading -->
-    <div id="loading-msg" class="status-msg" style="display:none;">Calculating your times...</div>
+    <div id="loading-msg" class="status-msg" style="display:none;">Fetching your prayer times...</div>
     <div id="error-msg" class="status-msg error-msg" style="display:none;"></div>
 
     <!-- Main section -->
@@ -281,9 +277,7 @@
       document.getElementById('error-msg').style.display = 'none';
 
       if (!navigator.geolocation) {
-        document.getElementById('loading-msg').style.display = 'none';
-        document.getElementById('location-prompt').style.display = 'block';
-        showCityInput();
+        showPromptError('Your browser does not support location. Try a different browser.');
         return;
       }
 
@@ -291,108 +285,37 @@
         async pos => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
-
-          // Save coords immediately — don't wait for reverse geocode
           userCity = 'Your Location';
-          localStorage.setItem('noor_lat',  lat);
-          localStorage.setItem('noor_lng',  lng);
-          localStorage.setItem('noor_city', userCity);
 
-          // Try to get city name (best-effort, non-blocking)
+          // Best-effort city name lookup — won't block if it fails
           try {
             const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
             const d = await r.json();
             userCity = [d.address.city || d.address.town || d.address.village || d.address.county, d.address.country].filter(Boolean).join(', ') || 'Your Location';
-            localStorage.setItem('noor_city', userCity);
           } catch { /* keep "Your Location" */ }
 
-          document.getElementById('loading-msg').textContent = 'Fetching prayer times...';
+          // Save coords immediately
+          localStorage.setItem('noor_lat',  lat);
+          localStorage.setItem('noor_lng',  lng);
+          localStorage.setItem('noor_city', userCity);
+
           await fetchTimes(lat, lng);
         },
         (err) => {
-          document.getElementById('loading-msg').style.display = 'none';
-          document.getElementById('location-prompt').style.display = 'block';
-          document.getElementById('error-msg').style.display = 'block';
-          document.getElementById('error-msg').textContent = err.code === 1
-            ? 'Location permission denied. Enter your city below.'
-            : 'Could not get location. Enter your city below.';
+          const msg = err.code === 1
+            ? 'Location permission was denied. Please enable location in your browser settings and try again.'
+            : 'Could not get your location. Please try again.';
+          showPromptError(msg);
         },
-        { timeout: 10000, maximumAge: 60000, enableHighAccuracy: false }
+        { timeout: 12000, maximumAge: 300000, enableHighAccuracy: false }
       );
     }
 
-    function showCityInput() {
-      document.getElementById('city-input-wrap').style.display = 'block';
-      setTimeout(() => document.getElementById('city-input').focus(), 100);
-    }
-
-    async function lookupCity() {
-      const cityRaw = document.getElementById('city-input').value.trim();
-      if (!cityRaw) {
-        document.getElementById('city-input').focus();
-        return;
-      }
-      document.getElementById('loading-msg').style.display = 'block';
-      document.getElementById('loading-msg').textContent = 'Finding your city...';
-      document.getElementById('location-prompt').style.display = 'none';
-      document.getElementById('error-msg').style.display = 'none';
-
-      try {
-        // Use Aladhan's city endpoint directly — no geocoding needed
-        const today = new Date();
-        const dd   = String(today.getDate()).padStart(2,'0');
-        const mm   = String(today.getMonth()+1).padStart(2,'0');
-        const yyyy = today.getFullYear();
-
-        // Split city/country if user typed "Lagos, Nigeria" or just "Lagos"
-        const parts   = cityRaw.split(',').map(s => s.trim());
-        const city    = parts[0];
-        const country = parts[1] || '';
-
-        let url = `https://api.aladhan.com/v1/timingsByCity/${dd}-${mm}-${yyyy}?city=${encodeURIComponent(city)}&method=3`;
-        if (country) url += `&country=${encodeURIComponent(country)}`;
-
-        const r = await fetch(url);
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        const d = await r.json();
-        if (d.status !== 'OK' && d.code !== 200) throw new Error('City not found');
-
-        const t = d.data.timings;
-        prayerData = {
-          fajr:    t.Fajr,
-          sunrise: t.Sunrise,
-          dhuhr:   t.Dhuhr,
-          asr:     t.Asr,
-          maghrib: t.Maghrib,
-          isha:    t.Isha,
-        };
-
-        // Use meta from response for lat/lng if available, otherwise store city name as key
-        const meta = d.data.meta;
-        const lat  = meta?.latitude  || 0;
-        const lng  = meta?.longitude || 0;
-        userCity   = cityRaw;
-
-        // Save to localStorage
-        localStorage.setItem('noor_lat',  lat);
-        localStorage.setItem('noor_lng',  lng);
-        localStorage.setItem('noor_city', userCity);
-        localStorage.setItem('noor_prayer_cache', JSON.stringify({
-          date: `${dd}-${mm}-${yyyy}`,
-          timings: prayerData
-        }));
-
-        document.getElementById('loading-msg').style.display = 'none';
-        document.getElementById('error-msg').style.display   = 'none';
-        renderMain();
-
-      } catch(e) {
-        console.error('lookupCity error:', e);
-        document.getElementById('loading-msg').style.display = 'none';
-        document.getElementById('location-prompt').style.display = 'block';
-        document.getElementById('error-msg').style.display = 'block';
-        document.getElementById('error-msg').textContent = `City not found. Try "Lagos, Nigeria" or "London, UK".`;
-      }
+    function showPromptError(msg) {
+      document.getElementById('loading-msg').style.display = 'none';
+      document.getElementById('location-prompt').style.display = 'block';
+      document.getElementById('error-msg').style.display = 'block';
+      document.getElementById('error-msg').textContent = msg;
     }
 
     // ── Fetch from Aladhan API ────────────────────────────────────
@@ -648,5 +571,6 @@
       }
     }
     // else: no saved location — location-prompt stays visible (default)
+  </script>
 </body>
 </html>
