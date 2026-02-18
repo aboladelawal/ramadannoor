@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Noor — Your Ramadan Companion</title>
+  <meta property="og:title" content="Noor — Your Ramadan Companion">
+  <meta property="og:description" content="Ramadan Real Talk Bingo + Personal Dua Generator. Made for Muslims, with love.">
+  <meta property="og:image" content="https://noor.vercel.app/og-image.png">
+  <meta property="og:url" content="https://noor.vercel.app">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Tajawal:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --bg2: #0f0f1a;
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --gold-dim: #7a6130;
+      --cream: #f5efe0;
+      --text: #e8dcc8;
+      --text-dim: #8a7d6a;
+      --glow: rgba(201, 168, 76, 0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Tajawal', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Stars background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(1px 1px at 15% 20%, rgba(201,168,76,0.6) 0%, transparent 100%),
+        radial-gradient(1px 1px at 85% 10%, rgba(201,168,76,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 40% 80%, rgba(201,168,76,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 60%, rgba(201,168,76,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 25% 45%, rgba(201,168,76,0.4) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 90% 75%, rgba(201,168,76,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55% 30%, rgba(201,168,76,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 10% 90%, rgba(201,168,76,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 15%, rgba(201,168,76,0.3) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 35% 65%, rgba(201,168,76,0.5) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 24px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .moon-wrap {
+      position: relative;
+      margin-bottom: 8px;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .moon {
+      font-size: 64px;
+      filter: drop-shadow(0 0 20px rgba(201,168,76,0.6));
+    }
+
+    .app-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 72px;
+      font-weight: 300;
+      color: var(--gold-light);
+      letter-spacing: 8px;
+      text-align: center;
+      line-height: 1;
+      text-shadow: 0 0 40px rgba(201,168,76,0.4);
+    }
+
+    .app-name span {
+      font-style: italic;
+      font-weight: 300;
+    }
+
+    .arabic-sub {
+      font-family: 'Tajawal', sans-serif;
+      font-size: 18px;
+      color: var(--gold-dim);
+      letter-spacing: 3px;
+      text-align: center;
+      margin-top: 4px;
+      font-weight: 300;
+    }
+
+    .tagline {
+      font-size: 14px;
+      color: var(--text-dim);
+      text-align: center;
+      margin-top: 16px;
+      margin-bottom: 48px;
+      letter-spacing: 1px;
+      font-weight: 300;
+    }
+
+    .cards {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card {
+      background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.03));
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(201,168,76,0.1), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(201,168,76,0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(201,168,76,0.15);
+    }
+
+    .card:hover::before { opacity: 1; }
+
+    .card-icon {
+      font-size: 36px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .card-label {
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--gold);
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 400;
+      color: var(--cream);
+      margin-bottom: 8px;
+      line-height: 1.2;
+    }
+
+    .card-desc {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    .card-arrow {
+      position: absolute;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gold-dim);
+      font-size: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover .card-arrow {
+      color: var(--gold);
+      right: 20px;
+    }
+
+    .card-bingo {
+      background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(180,120,40,0.05));
+    }
+
+    .footer {
+      margin-top: 48px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-dim);
+      font-weight: 300;
+      letter-spacing: 1px;
+    }
+
+    .footer a {
+      color: var(--gold-dim);
+      text-decoration: none;
+    }
+
+    .ramadan-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(201,168,76,0.1);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+      color: var(--gold);
+      letter-spacing: 1px;
+      margin-bottom: 24px;
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.2); }
+      50% { box-shadow: 0 0 0 8px rgba(201,168,76,0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="moon-wrap">
+      <div class="moon">☽</div>
+    </div>
+
+    <h1 class="app-name"><span>Noor</span></h1>
+    <div class="arabic-sub">نور</div>
+
+    <div class="ramadan-badge">
+      ✦ Ramadan Mubarak ✦
+    </div>
+
+    <p class="tagline">Your companion for the blessed month</p>
+
+    <div class="cards">
+      <a href="bingo.html" class="card card-bingo">
+        <span class="card-icon">☑️</span>
+        <div class="card-label">For the laughs</div>
+        <div class="card-title">Ramadan Real Talk</div>
+        <div class="card-desc">How is Ramadan really going for you? Tap what applies. No judgment.</div>
+        <span class="card-arrow">→</span>
+      </a>
+
+      <a href="dua.html" class="card">
+        <span class="card-icon">🤲</span>
+        <div class="card-label">For the heart</div>
+        <div class="card-title">Ya Allah...</div>
+        <div class="card-desc">Tell Him what's on your heart. Receive a dua made just for your moment.</div>
+        <span class="card-arrow">→</span>
+      </a>
+    </div>
+
+    <div class="footer">
+      Made with love for the Ummah &nbsp;·&nbsp; Ramadan 1446H<br>
+      <a href="https://twitter.com/_kingmufasa">@_kingmufasa</a>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ya Allah... — Noor</title>
+  <meta property="og:title" content="Ya Allah... — Personal Dua Generator">
+  <meta property="og:description" content="Tell Him what's on your heart. Receive a dua made just for your moment.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Tajawal:wght@300;400;500&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --bg2: #0f0f1a;
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --gold-dim: #7a6130;
+      --cream: #f5efe0;
+      --text: #e8dcc8;
+      --text-dim: #8a7d6a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Tajawal', sans-serif;
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(1px 1px at 20% 15%, rgba(201,168,76,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 80% 25%, rgba(201,168,76,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 50% 70%, rgba(201,168,76,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 75% 85%, rgba(201,168,76,0.3) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 10% 55%, rgba(201,168,76,0.4) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 24px 20px;
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 13px;
+      margin-bottom: 24px;
+      transition: color 0.2s;
+    }
+    .back:hover { color: var(--gold); }
+
+    .header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .header-icon {
+      font-size: 44px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 48px;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--gold-light);
+      line-height: 1;
+      text-shadow: 0 0 30px rgba(201,168,76,0.3);
+    }
+
+    .header-arabic {
+      font-family: 'Amiri', serif;
+      font-size: 28px;
+      color: var(--gold-dim);
+      margin-top: 4px;
+      letter-spacing: 2px;
+    }
+
+    .header p {
+      font-size: 14px;
+      color: var(--text-dim);
+      margin-top: 12px;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    /* Input section */
+    .input-section {
+      margin-bottom: 24px;
+    }
+
+    .input-label {
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .textarea-wrap {
+      position: relative;
+    }
+
+    textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 14px;
+      padding: 16px;
+      color: var(--text);
+      font-family: 'Tajawal', sans-serif;
+      font-size: 15px;
+      font-weight: 300;
+      resize: none;
+      outline: none;
+      line-height: 1.7;
+      transition: border-color 0.3s;
+      min-height: 100px;
+    }
+
+    textarea::placeholder { color: var(--text-dim); }
+    textarea:focus { border-color: rgba(201,168,76,0.4); }
+
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .suggestion {
+      background: rgba(201,168,76,0.08);
+      border: 1px solid rgba(201,168,76,0.18);
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 12px;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Tajawal', sans-serif;
+    }
+
+    .suggestion:hover {
+      border-color: rgba(201,168,76,0.4);
+      color: var(--gold);
+      background: rgba(201,168,76,0.12);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, var(--gold), #a07828);
+      color: #0a0a0f;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: all 0.3s;
+      margin-top: 16px;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(201,168,76,0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Loading */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .loading.show { display: block; }
+
+    .loading-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .loading-dots span {
+      width: 8px;
+      height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      animation: dot 1.4s ease-in-out infinite;
+    }
+
+    .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dot {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    .loading-text {
+      font-size: 14px;
+      color: var(--text-dim);
+      font-style: italic;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+    }
+
+    /* Dua result */
+    .dua-result {
+      display: none;
+    }
+
+    .dua-result.show { display: block; }
+
+    .dua-card {
+      background: linear-gradient(160deg, rgba(201,168,76,0.08), rgba(201,168,76,0.02));
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 20px;
+      padding: 32px 24px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dua-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    .dua-type {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .dua-arabic {
+      font-family: 'Amiri', serif;
+      font-size: 26px;
+      color: var(--cream);
+      text-align: right;
+      line-height: 2;
+      margin-bottom: 20px;
+      direction: rtl;
+    }
+
+    .dua-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+      margin: 20px 0;
+    }
+
+    .dua-transliteration {
+      font-style: italic;
+      color: var(--gold-light);
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 16px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+    }
+
+    .dua-meaning {
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    .personal-message-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(201,168,76,0.12);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .personal-message-label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--gold-dim);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .personal-message {
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.8;
+      font-weight: 300;
+    }
+
+    .source-note {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-align: center;
+      font-style: italic;
+      margin-bottom: 20px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px;
+    }
+
+    .result-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-another {
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: 12px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 15px;
+      color: var(--gold-light);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-another:hover {
+      border-color: rgba(201,168,76,0.5);
+      background: rgba(201,168,76,0.05);
+    }
+
+    .btn-share-dua {
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 12px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 14px;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-share-dua:hover {
+      border-color: rgba(201,168,76,0.3);
+      color: var(--gold);
+    }
+
+    .error-msg {
+      display: none;
+      background: rgba(255,80,80,0.1);
+      border: 1px solid rgba(255,80,80,0.2);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #ff8080;
+      margin-top: 12px;
+      text-align: center;
+    }
+
+    .error-msg.show { display: block; }
+
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(201,168,76,0.9);
+      color: #0a0a0f;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: transform 0.3s ease;
+      z-index: 200;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <a href="index.html" class="back">← Back to Noor</a>
+
+    <div class="header">
+      <span class="header-icon">🤲</span>
+      <h1>Ya Allah...</h1>
+      <div class="header-arabic">يا الله</div>
+      <p>Tell Him what's on your heart today. He already knows, but He loves to hear it from you.</p>
+    </div>
+
+    <!-- Input -->
+    <div class="input-section" id="input-section">
+      <label class="input-label">What's on your heart?</label>
+      <div class="textarea-wrap">
+        <textarea id="user-input" rows="4" placeholder="I'm struggling with exams and feeling overwhelmed... / I'm grateful for how far I've come this Ramadan... / I've been having anxiety lately and need peace..."></textarea>
+      </div>
+
+      <div class="suggestions">
+        <span class="suggestion" onclick="fillSuggestion(this)">😔 Heartbreak</span>
+        <span class="suggestion" onclick="fillSuggestion(this)">📚 Exams</span>
+        <span class="suggestion" onclick="fillSuggestion(this)">💼 Job search</span>
+        <span class="suggestion" onclick="fillSuggestion(this)">😰 Anxiety</span>
+        <span class="suggestion" onclick="fillSuggestion(this)">🙏 Gratitude</span>
+        <span class="suggestion" onclick="fillSuggestion(this)">👨‍👩‍👦 Family issues</span>
+        <span class="suggestion" onclick="fillSuggestion(this)">💊 Health</span>
+        <span class="suggestion" onclick="fillSuggestion(this)">😔 Feeling lost</span>
+      </div>
+
+      <button class="btn" id="generate-btn" onclick="generateDua()">🤲 Generate My Dua</button>
+      <div class="error-msg" id="error-msg">Something went wrong. Please try again in a moment.</div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading" id="loading">
+      <div class="loading-dots">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="loading-text">Finding the right words for your heart...</div>
+    </div>
+
+    <!-- Result -->
+    <div class="dua-result" id="dua-result">
+      <div class="dua-card">
+        <span class="dua-type" id="dua-type">DUA FOR YOUR MOMENT</span>
+        <div class="dua-arabic" id="dua-arabic"></div>
+        <div class="dua-divider"></div>
+        <div class="dua-transliteration" id="dua-transliteration"></div>
+        <div class="dua-meaning" id="dua-meaning"></div>
+      </div>
+
+      <div class="personal-message-card">
+        <span class="personal-message-label">A word for you</span>
+        <div class="personal-message" id="personal-message"></div>
+      </div>
+
+      <div class="source-note" id="source-note"></div>
+
+      <div class="result-actions">
+        <button class="btn-another" onclick="tryAnother()">🌙 Get another dua</button>
+        <button class="btn-share-dua" onclick="shareDua()">📤 Share this dua</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Copied! May it bring someone peace. 🌙</div>
+
+  <script>
+    const DUAS_DB = [
+      {
+        id: "anxiety",
+        tags: ["anxiety", "stress", "overwhelmed", "worried", "fear", "panic", "nervous"],
+        type: "DUA FOR ANXIETY & WORRY",
+        arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَأَعُوذُ بِكَ مِنَ الْعَجْزِ وَالْكَسَلِ",
+        transliteration: "Allahumma inni a'udhu bika minal-hammi wal-hazan, wa a'udhu bika minal-'ajzi wal-kasal",
+        meaning: "O Allah, I seek refuge in You from grief and sadness, and I seek refuge in You from weakness and laziness.",
+        source: "Sahih Al-Bukhari"
+      },
+      {
+        id: "exam_knowledge",
+        tags: ["exams", "study", "knowledge", "school", "learning", "test", "results", "university"],
+        type: "DUA FOR KNOWLEDGE & CLARITY",
+        arabic: "رَبِّ زِدْنِي عِلْمًا",
+        transliteration: "Rabbi zidni 'ilma",
+        meaning: "My Lord, increase me in knowledge.",
+        source: "Quran 20:114"
+      },
+      {
+        id: "difficulty",
+        tags: ["hard time", "difficulty", "struggling", "pain", "hardship", "trouble", "stuck", "lost"],
+        type: "DUA IN TIMES OF DIFFICULTY",
+        arabic: "حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ",
+        transliteration: "Hasbunallahu wa ni'mal-wakeel",
+        meaning: "Allah is sufficient for us, and He is the best Disposer of Affairs.",
+        source: "Quran 3:173"
+      },
+      {
+        id: "heartbreak",
+        tags: ["heartbreak", "heartbroken", "love", "relationship", "loss", "sad", "grief", "lonely", "loneliness"],
+        type: "DUA FOR A HEALING HEART",
+        arabic: "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ",
+        transliteration: "Ya Hayyu Ya Qayyumu bi-rahmatika astagheeth",
+        meaning: "O Ever-Living, O Sustainer, in Your mercy I seek relief.",
+        source: "Al-Mustadrak"
+      },
+      {
+        id: "job_rizq",
+        tags: ["job", "work", "money", "provision", "career", "unemployed", "rizq", "business", "finances", "financial"],
+        type: "DUA FOR PROVISION & WORK",
+        arabic: "اللَّهُمَّ اكْفِنِي بِحَلاَلِكَ عَنْ حَرَامِكَ وَأَغْنِنِي بِفَضْلِكَ عَمَّنْ سِوَاكَ",
+        transliteration: "Allahumma-kfini bi-halalika 'an haramika wa aghnini bi-fadlika 'amman siwak",
+        meaning: "O Allah, make what is lawful sufficient for me against what is unlawful, and enrich me by Your bounty, making me independent of all others.",
+        source: "Sunan Al-Tirmidhi"
+      },
+      {
+        id: "gratitude",
+        tags: ["grateful", "gratitude", "thankful", "blessed", "alhamdulillah", "happy", "good things"],
+        type: "DUA OF GRATITUDE",
+        arabic: "رَبِّ أَوْزِعْنِي أَنْ أَشْكُرَ نِعْمَتَكَ الَّتِي أَنْعَمْتَ عَلَيَّ",
+        transliteration: "Rabbi awzi'ni an ashkura ni'mataka allati an'amta 'alayya",
+        meaning: "My Lord, enable me to be grateful for Your favor which You have bestowed upon me.",
+        source: "Quran 27:19"
+      },
+      {
+        id: "health",
+        tags: ["health", "sick", "illness", "healing", "disease", "recovery", "hospital", "pain", "body"],
+        type: "DUA FOR HEALING",
+        arabic: "اللَّهُمَّ رَبَّ النَّاسِ أَذْهِبِ الْبَأْسَ اشْفِهِ وَأَنْتَ الشَّافِي لاَ شِفَاءَ إِلاَّ شِفَاؤُكَ",
+        transliteration: "Allahumma Rabb-an-naas, adh-hib il-ba's, washfihi wa Anta al-Shaafi, laa shifaa'a illa shifaa'uk",
+        meaning: "O Allah, Lord of mankind, remove the harm and heal him/her. You are the Healer. There is no healing except Your healing.",
+        source: "Sahih Al-Bukhari & Muslim"
+      },
+      {
+        id: "family",
+        tags: ["family", "parents", "mother", "father", "siblings", "children", "home", "marriage", "spouse"],
+        type: "DUA FOR FAMILY & LOVED ONES",
+        arabic: "رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا",
+        transliteration: "Rabbana hab lana min azwajina wa dhurriyyatina qurrata a'yunin waj'alna lil-muttaqina imama",
+        meaning: "Our Lord, grant us from among our spouses and offspring comfort to our eyes, and make us a leader for the righteous.",
+        source: "Quran 25:74"
+      },
+      {
+        id: "forgiveness",
+        tags: ["sin", "forgiveness", "guilt", "regret", "repentance", "mistake", "wrong", "tawbah", "ashamed"],
+        type: "DUA FOR FORGIVENESS",
+        arabic: "رَبَّنَا ظَلَمْنَا أَنفُسَنَا وَإِن لَّمْ تَغْفِرْ لَنَا وَتَرْحَمْنَا لَنَكُونَنَّ مِنَ الْخَاسِرِينَ",
+        transliteration: "Rabbana zalamna anfusana wa-in lam taghfir lana wa-tarhamna lanakunanna minal-khasirin",
+        meaning: "Our Lord, we have wronged ourselves, and if You do not forgive us and have mercy upon us, we will surely be among the losers.",
+        source: "Quran 7:23"
+      },
+      {
+        id: "guidance",
+        tags: ["guidance", "confused", "decision", "direction", "path", "lost", "istikhara", "choice", "unsure"],
+        type: "DUA FOR GUIDANCE",
+        arabic: "اللَّهُمَّ إِنِّي أَسْتَخِيرُكَ بِعِلْمِكَ وَأَسْتَقْدِرُكَ بِقُدْرَتِكَ",
+        transliteration: "Allahumma inni astakhiruka bi 'ilmika, wa astaqdiruka bi qudratik",
+        meaning: "O Allah, I seek Your guidance through Your knowledge, and I seek ability through Your power.",
+        source: "Sahih Al-Bukhari (Istikhara)"
+      },
+      {
+        id: "peace",
+        tags: ["peace", "calm", "restless", "sleep", "insomnia", "mind", "quiet", "tired", "burnout"],
+        type: "DUA FOR PEACE OF MIND",
+        arabic: "أَلاَ بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
+        transliteration: "Ala bidhikrillahi tatma'innu al-qulub",
+        meaning: "Verily, in the remembrance of Allah do hearts find rest.",
+        source: "Quran 13:28"
+      },
+      {
+        id: "general",
+        tags: [],
+        type: "DUA FOR YOUR MOMENT",
+        arabic: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ",
+        transliteration: "Rabbana atina fid-dunya hasanatan wa fil-akhirati hasanatan wa qina 'adhaban-nar",
+        meaning: "Our Lord, give us good in this world and good in the Hereafter, and protect us from the punishment of the Fire.",
+        source: "Quran 2:201"
+      }
+    ];
+
+    let lastDuaId = null;
+    let currentDuaText = '';
+
+    function fillSuggestion(el) {
+      const text = el.textContent.replace(/^[^\s]+\s/, '');
+      document.getElementById('user-input').value = `I'm going through ${text.toLowerCase()} right now`;
+      document.getElementById('user-input').focus();
+    }
+
+    function matchDua(input) {
+      const lower = input.toLowerCase();
+      let bestMatch = null;
+      let bestScore = 0;
+
+      for (const dua of DUAS_DB) {
+        if (dua.id === 'general') continue;
+        if (dua.id === lastDuaId) continue;
+
+        let score = 0;
+        for (const tag of dua.tags) {
+          if (lower.includes(tag)) score += tag.length;
+        }
+        if (score > bestScore) {
+          bestScore = score;
+          bestMatch = dua;
+        }
+      }
+
+      if (!bestMatch) {
+        const fallbacks = DUAS_DB.filter(d => d.id !== lastDuaId);
+        bestMatch = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+      }
+
+      return bestMatch;
+    }
+
+    async function generateDua() {
+      const input = document.getElementById('user-input').value.trim();
+      if (!input) {
+        document.getElementById('user-input').focus();
+        return;
+      }
+
+      // Hide error, show loading
+      document.getElementById('error-msg').classList.remove('show');
+      document.getElementById('input-section').style.display = 'none';
+      document.getElementById('dua-result').classList.remove('show');
+      document.getElementById('loading').classList.add('show');
+
+      const matchedDua = matchDua(input);
+      lastDuaId = matchedDua.id;
+
+      try {
+        const response = await fetch('/api/dua', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userSituation: input,
+            duaArabic: matchedDua.arabic,
+            duaMeaning: matchedDua.meaning,
+            duaType: matchedDua.type
+          })
+        });
+
+        if (!response.ok) throw new Error('API error');
+        const data = await response.json();
+
+        displayDua(matchedDua, data.message);
+      } catch (err) {
+        // Fallback personal message if API fails
+        const fallbackMessages = [
+          `Whatever you're carrying right now, you don't have to carry it alone. Allah sees you — not just your actions, but your intentions, your struggles, the weight you wake up with every morning. This dua has been a source of strength for countless believers before you. Make it yours today.`,
+          `There's something beautiful about the fact that you're here, seeking. That alone is a sign of a heart that hasn't given up. Recite this dua with presence — even if the Arabic feels unfamiliar, your sincerity is what reaches Him.`,
+          `This Ramadan, whatever you're going through, remember that difficulty and closeness to Allah often come together. The most broken hearts have made the most powerful duas. Yours counts.`
+        ];
+        const msg = fallbackMessages[Math.floor(Math.random() * fallbackMessages.length)];
+        displayDua(matchedDua, msg);
+      }
+    }
+
+    function displayDua(dua, personalMessage) {
+      document.getElementById('loading').classList.remove('show');
+
+      document.getElementById('dua-type').textContent = dua.type;
+      document.getElementById('dua-arabic').textContent = dua.arabic;
+      document.getElementById('dua-transliteration').textContent = dua.transliteration;
+      document.getElementById('dua-meaning').textContent = '"' + dua.meaning + '"';
+      document.getElementById('personal-message').textContent = personalMessage;
+      document.getElementById('source-note').textContent = '— ' + dua.source;
+
+      currentDuaText = `${dua.arabic}\n\n${dua.transliteration}\n\n"${dua.meaning}"\n\n— ${dua.source}\n\nFind your personal dua at noor.vercel.app`;
+
+      document.getElementById('dua-result').classList.add('show');
+
+      // Animate in
+      const card = document.querySelector('.dua-card');
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      setTimeout(() => {
+        card.style.transition = 'all 0.5s ease';
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+      }, 50);
+    }
+
+    function tryAnother() {
+      const input = document.getElementById('user-input').value;
+      document.getElementById('dua-result').classList.remove('show');
+      document.getElementById('loading').classList.add('show');
+
+      setTimeout(() => {
+        const matchedDua = matchDua(input + ' ' + Math.random()); // slight variation to avoid same match
+        lastDuaId = matchedDua.id;
+
+        fetch('/api/dua', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userSituation: input,
+            duaArabic: matchedDua.arabic,
+            duaMeaning: matchedDua.meaning,
+            duaType: matchedDua.type
+          })
+        })
+        .then(r => r.json())
+        .then(data => displayDua(matchedDua, data.message))
+        .catch(() => {
+          displayDua(matchedDua, "Every dua you make in Ramadan carries extra weight. Keep going.");
+        });
+      }, 500);
+    }
+
+    async function shareDua() {
+      try {
+        if (navigator.share) {
+          await navigator.share({ text: currentDuaText });
+        } else {
+          await navigator.clipboard.writeText(currentDuaText);
+          const toast = document.getElementById('toast');
+          toast.classList.add('show');
+          setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+      } catch {}
+    }
+  </script>
+</body>
+</html>
