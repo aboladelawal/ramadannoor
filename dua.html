@@ -526,7 +526,7 @@
 
       <div class="result-actions">
         <button class="btn-another" onclick="tryAnother()">🌙 Get another dua</button>
-        <button class="btn-share-dua" onclick="shareDua()">📤 Share this dua</button>
+        <button class="btn-share-dua" onclick="shareDua()">🖼 Save & Share Card</button>
         <button class="btn-new" onclick="startFresh()">← Try a different situation</button>
       </div>
     </div>
@@ -853,6 +853,7 @@
 
     
     let currentDuaText = '';
+    let currentDuaObj  = null; // store full dua for image card
     let savedInput = ''; // persists original input for tryAnother rotations
 
     const MAX_CHIPS = 3;
@@ -990,6 +991,7 @@
     }
 
     function displayDua(dua, personalMessage) {
+      currentDuaObj = dua; // save for share card
       document.getElementById('loading').classList.remove('show');
 
       document.getElementById('dua-type').textContent = dua.type;
@@ -1063,16 +1065,232 @@
     }
 
     async function shareDua() {
-      try {
-        if (navigator.share) {
-          await navigator.share({ text: currentDuaText });
-        } else {
-          await navigator.clipboard.writeText(currentDuaText);
-          const toast = document.getElementById('toast');
-          toast.classList.add('show');
-          setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-      } catch {}
+      if (!currentDuaObj) return;
+      const canvas = generateDuaCard(currentDuaObj);
+      await shareCanvas(canvas, 'noor-dua.png');
+    }
+
+    function generateDuaCard(dua) {
+      const W = 1080, H = 1080;
+      const canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d');
+
+      // Background
+      ctx.fillStyle = '#0a0a0f';
+      ctx.fillRect(0, 0, W, H);
+
+      // Star particles
+      const stars = [[162,216,0.5],[918,108,0.3],[432,864,0.4],[756,648,0.25],[108,594,0.35],[648,378,0.3],[972,864,0.25]];
+      stars.forEach(([x,y,a]) => {
+        const g = ctx.createRadialGradient(x,y,0,x,y,1.5);
+        g.addColorStop(0, `rgba(201,168,76,${a})`);
+        g.addColorStop(1, 'transparent');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(x, y, 1.5, 0, Math.PI*2); ctx.fill();
+      });
+
+      // Top glow
+      const topGlow = ctx.createRadialGradient(W/2, 0, 0, W/2, 0, 400);
+      topGlow.addColorStop(0, 'rgba(201,168,76,0.08)');
+      topGlow.addColorStop(1, 'transparent');
+      ctx.fillStyle = topGlow;
+      ctx.fillRect(0, 0, W, H);
+
+      // Card border
+      ctx.strokeStyle = 'rgba(201,168,76,0.2)';
+      ctx.lineWidth = 2;
+      roundRect(ctx, 60, 60, W-120, H-120, 32);
+      ctx.stroke();
+
+      // ✦ Noor header
+      ctx.fillStyle = '#7a6130';
+      ctx.font = '600 28px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('✦  N O O R  ✦', W/2, 140);
+
+      // Divider line
+      ctx.strokeStyle = 'rgba(201,168,76,0.15)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(160, 165); ctx.lineTo(W-160, 165); ctx.stroke();
+
+      // Dua type label
+      ctx.fillStyle = '#7a6130';
+      ctx.font = '500 22px sans-serif';
+      ctx.letterSpacing = '3px';
+      ctx.fillText(dua.type, W/2, 220);
+      ctx.letterSpacing = '0px';
+
+      // Arabic text — wrap it
+      ctx.fillStyle = '#e8c97a';
+      ctx.font = '52px serif';
+      ctx.textAlign = 'center';
+      const arabicLines = wrapText(ctx, dua.arabic, W - 160);
+      let arabicY = 320;
+      arabicLines.forEach(line => {
+        ctx.fillText(line, W/2, arabicY);
+        arabicY += 72;
+      });
+
+      // Divider
+      arabicY += 20;
+      ctx.strokeStyle = 'rgba(201,168,76,0.12)';
+      ctx.beginPath(); ctx.moveTo(200, arabicY); ctx.lineTo(W-200, arabicY); ctx.stroke();
+      arabicY += 40;
+
+      // Transliteration — italic
+      ctx.fillStyle = '#c9a84c';
+      ctx.font = 'italic 30px serif';
+      const transLines = wrapText(ctx, dua.transliteration, W - 200);
+      transLines.forEach(line => {
+        ctx.fillText(line, W/2, arabicY);
+        arabicY += 44;
+      });
+      arabicY += 16;
+
+      // Meaning
+      ctx.fillStyle = '#8a7d6a';
+      ctx.font = '26px sans-serif';
+      const meaningText = `"${dua.meaning}"`;
+      const meaningLines = wrapText(ctx, meaningText, W - 220);
+      meaningLines.forEach(line => {
+        ctx.fillText(line, W/2, arabicY);
+        arabicY += 38;
+      });
+
+      // Bottom divider
+      ctx.strokeStyle = 'rgba(201,168,76,0.15)';
+      ctx.beginPath(); ctx.moveTo(160, H-175); ctx.lineTo(W-160, H-175); ctx.stroke();
+
+      // Source
+      ctx.fillStyle = '#7a6130';
+      ctx.font = '24px serif';
+      ctx.fillText(`— ${dua.source}`, W/2, H-135);
+
+      // URL
+      ctx.fillStyle = '#5a4820';
+      ctx.font = '22px sans-serif';
+      ctx.fillText('noor-seven-lac.vercel.app', W/2, H-90);
+
+      return canvas;
+    }
+
+    function generateDeedsCard(count, stars, totalDeeds, ramadanDay, doneObj) {
+      const W = 1080, H = 1080;
+      const canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#0a0a0f';
+      ctx.fillRect(0, 0, W, H);
+
+      // Top glow
+      const g = ctx.createRadialGradient(W/2, 0, 0, W/2, 0, 500);
+      g.addColorStop(0, 'rgba(201,168,76,0.1)'); g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+      // Border
+      ctx.strokeStyle = 'rgba(201,168,76,0.2)'; ctx.lineWidth = 2;
+      roundRect(ctx, 60, 60, W-120, H-120, 32); ctx.stroke();
+
+      // Header
+      ctx.fillStyle = '#7a6130'; ctx.font = '600 28px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('✦  N O O R  ✦', W/2, 140);
+      ctx.strokeStyle = 'rgba(201,168,76,0.15)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(160, 165); ctx.lineTo(W-160, 165); ctx.stroke();
+
+      // Day
+      ctx.fillStyle = '#7a6130'; ctx.font = '500 26px sans-serif';
+      ctx.fillText(`RAMADAN DAY ${ramadanDay} · 1447H`, W/2, 220);
+
+      // Score ring
+      const cx = W/2, cy = 420, r = 130;
+      ctx.strokeStyle = 'rgba(201,168,76,0.12)'; ctx.lineWidth = 8;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.stroke();
+      const pct = count / totalDeeds;
+      ctx.strokeStyle = '#c9a84c'; ctx.lineWidth = 8;
+      ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI/2, -Math.PI/2 + pct * Math.PI*2); ctx.stroke();
+
+      // Score number
+      ctx.fillStyle = '#e8c97a'; ctx.font = '700 80px serif'; ctx.textAlign = 'center';
+      ctx.fillText(count, cx, cy + 20);
+      ctx.fillStyle = '#8a7d6a'; ctx.font = '26px sans-serif';
+      ctx.fillText(`/ ${totalDeeds} deeds`, cx, cy + 60);
+
+      // Stars
+      const starStr = '★'.repeat(stars) + '☆'.repeat(5 - stars);
+      ctx.fillStyle = '#c9a84c'; ctx.font = '52px sans-serif';
+      ctx.fillText(starStr, W/2, 615);
+
+      // Label
+      const labels = [[0,'Keep going'],[1,'A good start'],[4,'Building momentum'],[7,'Doing well'],[11,'Almost there'],[15,'Full day! MashaAllah']];
+      const lbl = [...labels].reverse().find(([n]) => count >= n);
+      ctx.fillStyle = '#8a7d6a'; ctx.font = 'italic 28px serif';
+      ctx.fillText(lbl[1], W/2, 670);
+
+      // Divider
+      ctx.strokeStyle = 'rgba(201,168,76,0.15)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(160, H-175); ctx.lineTo(W-160, H-175); ctx.stroke();
+
+      ctx.fillStyle = '#7a6130'; ctx.font = '24px serif';
+      ctx.fillText('Track your Ramadan deeds', W/2, H-130);
+      ctx.fillStyle = '#5a4820'; ctx.font = '22px sans-serif';
+      ctx.fillText('noor-seven-lac.vercel.app', W/2, H-88);
+
+      return canvas;
+    }
+
+    // ── Canvas helpers ────────────────────────────────────────────
+    function wrapText(ctx, text, maxWidth) {
+      const words = text.split(' ');
+      const lines = [];
+      let line = '';
+      words.forEach(word => {
+        const test = line ? line + ' ' + word : word;
+        if (ctx.measureText(test).width > maxWidth && line) {
+          lines.push(line);
+          line = word;
+        } else { line = test; }
+      });
+      if (line) lines.push(line);
+      return lines;
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x+r, y);
+      ctx.lineTo(x+w-r, y); ctx.arcTo(x+w, y, x+w, y+r, r);
+      ctx.lineTo(x+w, y+h-r); ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
+      ctx.lineTo(x+r, y+h); ctx.arcTo(x, y+h, x, y+h-r, r);
+      ctx.lineTo(x, y+r); ctx.arcTo(x, y, x+r, y, r);
+      ctx.closePath();
+    }
+
+    async function shareCanvas(canvas, filename) {
+      return new Promise(resolve => {
+        canvas.toBlob(async blob => {
+          const file = new File([blob], filename, { type: 'image/png' });
+          try {
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+              await navigator.share({ files: [file], title: 'Noor · Ramadan 1447H', url: 'https://noor-seven-lac.vercel.app' });
+            } else {
+              // Fallback: download the image
+              const a = document.createElement('a');
+              a.href = URL.createObjectURL(blob);
+              a.download = filename;
+              a.click();
+            }
+          } catch {
+            // User cancelled or error — silently download
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            a.click();
+          }
+          resolve();
+        }, 'image/png');
+      });
     }
 
     // Name greeting

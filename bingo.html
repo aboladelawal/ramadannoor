@@ -398,7 +398,7 @@
       <div class="result-title" id="result-title"></div>
       <div class="result-message" id="result-message"></div>
       <div class="result-actions">
-        <button class="btn-share" onclick="shareResult()">Share My Result 📤</button>
+        <button class="btn-share" onclick="shareResult()">🖼 Save & Share Card</button>
         <a href="dua.html" class="btn-dua">🤲 Get a personal dua for Ramadan</a>
         <button class="btn-retry" onclick="closeResult()">← Try again</button>
       </div>
@@ -573,21 +573,136 @@
     async function shareResult() {
       const count = selected.size;
       const result = RESULTS.find(r => count >= r.min && count <= r.max) || RESULTS[RESULTS.length - 1];
-      const text = `I scored ${count}/15 on the Ramadan Real Talk Bingo 🌙\n\nMy title: "${result.title}"\n\nWhat's yours? → https://noor-seven-lac.vercel.app?ref=share\n\n#Ramadan1447 #NoorApp #RamadanMubarak`;
+      const checkedItems = [...selected].map(i => currentSquares[i]);
+      const canvas = generateBingoCard(count, result, checkedItems);
+      await shareCanvas(canvas, 'noor-bingo.png');
+    }
 
-      try {
-        if (navigator.share) {
-          await navigator.share({ text });
-        } else {
-          await navigator.clipboard.writeText(text);
-          showToast();
-        }
-      } catch {
-        try {
-          await navigator.clipboard.writeText(text);
-          showToast();
-        } catch { showToast('Share manually from the text above'); }
-      }
+    function generateBingoCard(count, result, checkedItems) {
+      const W = 1080, H = 1350;
+      const canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#0a0a0f';
+      ctx.fillRect(0, 0, W, H);
+
+      // Top glow
+      const g = ctx.createRadialGradient(W/2, 0, 0, W/2, 0, 500);
+      g.addColorStop(0, 'rgba(201,168,76,0.1)'); g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+
+      // Border
+      ctx.strokeStyle = 'rgba(201,168,76,0.2)'; ctx.lineWidth = 2;
+      roundRect(ctx, 60, 60, W-120, H-120, 32); ctx.stroke();
+
+      // Header
+      ctx.fillStyle = '#7a6130'; ctx.font = '600 28px sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('✦  N O O R  ✦', W/2, 140);
+      ctx.strokeStyle = 'rgba(201,168,76,0.15)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(160, 165); ctx.lineTo(W-160, 165); ctx.stroke();
+
+      // Title
+      ctx.fillStyle = '#e8c97a'; ctx.font = '700 52px serif';
+      ctx.fillText('Ramadan Real Talk', W/2, 240);
+      ctx.fillStyle = '#c9a84c'; ctx.font = '400 32px serif';
+      ctx.fillText('Bingo 🌙', W/2, 290);
+
+      // Score
+      ctx.fillStyle = '#e8c97a'; ctx.font = '700 110px serif';
+      ctx.fillText(`${count}/15`, W/2, 420);
+
+      // Result title
+      ctx.fillStyle = '#c9a84c'; ctx.font = 'italic 38px serif';
+      const titleLines = wrapText(ctx, `"${result.title}"`, W - 160);
+      let ty = 480;
+      titleLines.forEach(l => { ctx.fillText(l, W/2, ty); ty += 52; });
+
+      // Divider
+      ty += 10;
+      ctx.strokeStyle = 'rgba(201,168,76,0.15)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(160, ty); ctx.lineTo(W-160, ty); ctx.stroke();
+      ty += 40;
+
+      // Checked items label
+      ctx.fillStyle = '#7a6130'; ctx.font = '500 22px sans-serif';
+      ctx.fillText('WHAT I TICKED', W/2, ty); ty += 44;
+
+      // Checked items list
+      ctx.textAlign = 'left';
+      const colW = (W - 200) / 2;
+      checkedItems.forEach((item, i) => {
+        const col = i % 2;
+        const row = Math.floor(i / 2);
+        const x = 120 + col * (colW + 40);
+        const y = ty + row * 52;
+        // Item bg pill
+        ctx.fillStyle = 'rgba(201,168,76,0.08)';
+        roundRect(ctx, x - 10, y - 28, colW, 42, 10);
+        ctx.fill();
+        // Text
+        ctx.fillStyle = '#e8dcc8'; ctx.font = '24px sans-serif';
+        const short = item.length > 28 ? item.slice(0, 27) + '…' : item;
+        ctx.fillText(short, x + 8, y);
+      });
+
+      const rows = Math.ceil(checkedItems.length / 2);
+      ty += rows * 52 + 20;
+
+      // Footer
+      ctx.textAlign = 'center';
+      ctx.strokeStyle = 'rgba(201,168,76,0.15)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(160, H-175); ctx.lineTo(W-160, H-175); ctx.stroke();
+      ctx.fillStyle = '#7a6130'; ctx.font = '24px serif';
+      ctx.fillText('What\'s your Ramadan Real Talk score?', W/2, H-130);
+      ctx.fillStyle = '#5a4820'; ctx.font = '22px sans-serif';
+      ctx.fillText('noor-seven-lac.vercel.app', W/2, H-88);
+
+      return canvas;
+    }
+
+    // ── Canvas helpers (shared) ───────────────────────────────────
+    function wrapText(ctx, text, maxWidth) {
+      const words = text.split(' ');
+      const lines = [];
+      let line = '';
+      words.forEach(word => {
+        const test = line ? line + ' ' + word : word;
+        if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = word; }
+        else { line = test; }
+      });
+      if (line) lines.push(line);
+      return lines;
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x+r, y);
+      ctx.lineTo(x+w-r, y); ctx.arcTo(x+w, y, x+w, y+r, r);
+      ctx.lineTo(x+w, y+h-r); ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
+      ctx.lineTo(x+r, y+h); ctx.arcTo(x, y+h, x, y+h-r, r);
+      ctx.lineTo(x, y+r); ctx.arcTo(x, y, x+r, y, r);
+      ctx.closePath();
+    }
+
+    async function shareCanvas(canvas, filename) {
+      return new Promise(resolve => {
+        canvas.toBlob(async blob => {
+          const file = new File([blob], filename, { type: 'image/png' });
+          try {
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+              await navigator.share({ files: [file], title: 'Noor · Ramadan 1447H', url: 'https://noor-seven-lac.vercel.app' });
+            } else {
+              const a = document.createElement('a');
+              a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+            }
+          } catch {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+          }
+          resolve();
+        }, 'image/png');
+      });
     }
 
     function showToast(msg) {
