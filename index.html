@@ -20,9 +20,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Tajawal:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0a0a0f; --bg2: #0f0f1a; --gold: #c9a84c; --gold-light: #e8c97a;
+      --bg: #0a0a0f; --gold: #c9a84c; --gold-light: #e8c97a;
       --gold-dim: #7a6130; --cream: #f5efe0; --text: #e8dcc8; --text-dim: #8a7d6a;
-      --glow: rgba(201,168,76,0.15);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: var(--bg); color: var(--text); font-family: 'Tajawal', sans-serif; min-height: 100vh; overflow-x: hidden; }
@@ -41,28 +40,59 @@
         radial-gradient(1.5px 1.5px at 35% 65%, rgba(201,168,76,0.5) 0%, transparent 100%);
     }
     .container { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 0 24px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    .moon-wrap { position: relative; margin-bottom: 8px; animation: float 4s ease-in-out infinite; }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .moon-wrap { margin-bottom: 8px; animation: float 4s ease-in-out infinite; }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
     .moon { font-size: 64px; filter: drop-shadow(0 0 20px rgba(201,168,76,0.6)); }
     .app-name { font-family: 'Cormorant Garamond', serif; font-size: 72px; font-weight: 300; color: var(--gold-light); letter-spacing: 8px; text-align: center; line-height: 1; text-shadow: 0 0 40px rgba(201,168,76,0.4); }
     .app-name span { font-style: italic; }
-    .arabic-sub { font-family: 'Tajawal', sans-serif; font-size: 18px; color: var(--gold-dim); letter-spacing: 3px; text-align: center; margin-top: 4px; font-weight: 300; }
-    .tagline { font-size: 14px; color: var(--text-dim); text-align: center; margin-top: 16px; margin-bottom: 48px; letter-spacing: 1px; font-weight: 300; transition: all 0.4s; }
-    .cards { width: 100%; display: flex; flex-direction: column; gap: 16px; }
-    .card { background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.03)); border: 1px solid rgba(201,168,76,0.2); border-radius: 16px; padding: 28px 24px; text-decoration: none; color: inherit; display: block; transition: all 0.3s ease; position: relative; overflow: hidden; cursor: pointer; }
+    .arabic-sub { font-size: 18px; color: var(--gold-dim); letter-spacing: 3px; text-align: center; margin-top: 4px; font-weight: 300; }
+
+    /* Greeting line */
+    .greeting {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      font-style: italic;
+      color: var(--gold-light);
+      text-align: center;
+      margin-top: 16px;
+      letter-spacing: 0.5px;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+      min-height: 28px;
+    }
+    .greeting.visible { opacity: 1; transform: translateY(0); }
+
+    .ramadan-badge { display: inline-flex; align-items: center; background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.2); border-radius: 20px; padding: 6px 14px; font-size: 12px; color: var(--gold); letter-spacing: 1px; margin-top: 12px; margin-bottom: 8px; animation: pulse 3s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0.2)} 50%{box-shadow:0 0 0 8px rgba(201,168,76,0)} }
+    .tagline { font-size: 13px; color: var(--text-dim); text-align: center; margin-bottom: 36px; letter-spacing: 1px; font-weight: 300; font-style: italic; }
+
+    .cards { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .card { background: linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.03)); border: 1px solid rgba(201,168,76,0.2); border-radius: 16px; padding: 20px 16px; text-decoration: none; color: inherit; display: block; transition: all 0.3s ease; position: relative; overflow: hidden; cursor: pointer; }
     .card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(201,168,76,0.1), transparent); opacity: 0; transition: opacity 0.3s ease; }
     .card:hover { border-color: rgba(201,168,76,0.5); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(201,168,76,0.15); }
     .card:hover::before { opacity: 1; }
-    .card-icon { font-size: 36px; margin-bottom: 12px; display: block; }
-    .card-label { font-size: 11px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; font-weight: 500; margin-bottom: 6px; }
-    .card-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; color: var(--cream); margin-bottom: 8px; line-height: 1.2; }
-    .card-desc { font-size: 13px; color: var(--text-dim); line-height: 1.6; font-weight: 300; }
-    .card-arrow { position: absolute; right: 24px; top: 50%; transform: translateY(-50%); color: var(--gold-dim); font-size: 20px; transition: all 0.3s ease; }
-    .card:hover .card-arrow { color: var(--gold); right: 20px; }
+    .card-icon { font-size: 28px; margin-bottom: 10px; display: block; }
+    .card-label { font-size: 10px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; font-weight: 500; margin-bottom: 4px; }
+    .card-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; color: var(--cream); margin-bottom: 6px; line-height: 1.2; }
+    .card-desc { font-size: 12px; color: var(--text-dim); line-height: 1.5; font-weight: 300; }
     .card-bingo { background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(180,120,40,0.05)); }
-    .footer { margin-top: 48px; text-align: center; font-size: 12px; color: var(--text-dim); font-weight: 300; letter-spacing: 1px; line-height: 1.8; }
-    .ramadan-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.2); border-radius: 20px; padding: 6px 14px; font-size: 12px; color: var(--gold); letter-spacing: 1px; margin-bottom: 24px; animation: pulse 3s ease-in-out infinite; transition: all 0.4s; }
-    @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.2); } 50% { box-shadow: 0 0 0 8px rgba(201,168,76,0); } }
+    .card-iftar { background: linear-gradient(135deg, rgba(180,80,20,0.1), rgba(201,168,76,0.04)); }
+    .card-deeds { background: linear-gradient(135deg, rgba(40,120,80,0.1), rgba(201,168,76,0.04)); }
+    .footer { margin-top: 48px; margin-bottom: 24px; text-align: center; font-size: 12px; color: var(--text-dim); font-weight: 300; letter-spacing: 1px; line-height: 1.8; }
+
+    /* Overlays */
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; align-items: center; justify-content: center; padding: 24px; }
+    .overlay-box { background: #0f0f1a; border: 1px solid rgba(201,168,76,0.35); border-radius: 20px; padding: 40px 28px; max-width: 380px; width: 100%; text-align: center; }
+    .overlay-moon { font-size: 52px; margin-bottom: 14px; }
+    .overlay-title { font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--gold-light); margin-bottom: 8px; line-height: 1.3; }
+    .overlay-sub { font-size: 13px; color: var(--text-dim); line-height: 1.8; margin-bottom: 28px; }
+    .overlay-sub small { font-size: 11px; color: #5a4d3a; }
+    .overlay-input { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(201,168,76,0.25); border-radius: 12px; padding: 14px 16px; color: var(--text); font-family: 'Tajawal', sans-serif; font-size: 15px; outline: none; margin-bottom: 14px; text-align: center; }
+    .overlay-input:focus { border-color: rgba(201,168,76,0.5); }
+    .overlay-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #c9a84c, #a07828); border: none; border-radius: 12px; color: #0a0a0f; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Tajawal', sans-serif; margin-bottom: 10px; letter-spacing: 0.5px; }
+    .overlay-skip { width: 100%; padding: 10px; background: transparent; border: none; color: #5a4d3a; font-size: 12px; cursor: pointer; font-family: 'Tajawal', sans-serif; }
+    .overlay-skip:hover { color: var(--gold-dim); }
   </style>
 </head>
 <body>
@@ -70,72 +100,154 @@
     <div class="moon-wrap"><div class="moon">☽</div></div>
     <h1 class="app-name"><span>Noor</span></h1>
     <div class="arabic-sub">نور</div>
+
+    <!-- Personal greeting — fades in once name is known -->
+    <div class="greeting" id="greeting"></div>
+
     <div class="ramadan-badge" id="ramadan-badge">✦ Ramadan Mubarak ✦</div>
     <p class="tagline" id="tagline">Your companion for the blessed month</p>
+
     <div class="cards">
       <a href="bingo.html" class="card card-bingo">
         <span class="card-icon">☑️</span>
         <div class="card-label">For the laughs</div>
         <div class="card-title">Ramadan Real Talk</div>
-        <div class="card-desc">How is Ramadan really going for you? Tap what applies. No judgment.</div>
-        <span class="card-arrow">→</span>
+        <div class="card-desc">How is Ramadan going? No judgment.</div>
       </a>
       <a href="dua.html" class="card">
         <span class="card-icon">🤲</span>
         <div class="card-label">For the heart</div>
         <div class="card-title">Ya Allah...</div>
-        <div class="card-desc">Tell Him what's on your heart. Receive a dua made just for your moment.</div>
-        <span class="card-arrow">→</span>
+        <div class="card-desc">Tell Him what's on your heart.</div>
+      </a>
+      <a href="iftar.html" class="card card-iftar">
+        <span class="card-icon">🌅</span>
+        <div class="card-label">Live countdown</div>
+        <div class="card-title">Iftar Time</div>
+        <div class="card-desc">How long until you can eat?</div>
+      </a>
+      <a href="deeds.html" class="card card-deeds">
+        <span class="card-icon">✅</span>
+        <div class="card-label">Daily tracker</div>
+        <div class="card-title">Good Deeds</div>
+        <div class="card-desc">Tap what you've done today.</div>
       </a>
     </div>
     <div class="footer">Made with love for the Ummah &nbsp;·&nbsp; Ramadan 1447H<br>Abolade Lawal</div>
   </div>
 
-  <!-- Welcome popup for ?ref=share visitors -->
-  <div id="welcome-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:999; align-items:center; justify-content:center; padding:24px;">
-    <div style="background:#0f0f1a; border:1px solid rgba(201,168,76,0.4); border-radius:20px; padding:36px 28px; max-width:380px; width:100%; text-align:center;">
-      <div style="font-size:48px; margin-bottom:12px;">🌙</div>
-      <div style="font-family:'Cormorant Garamond',serif; font-size:32px; color:#e8c97a; margin-bottom:8px;">Ramadan Mubarak</div>
-      <div style="font-size:14px; color:#8a7d6a; line-height:1.7; margin-bottom:24px;">Someone thought of you this Ramadan.<br>Explore the bingo, find a dua for your heart.</div>
-      <button onclick="document.getElementById('welcome-overlay').style.display='none'" style="width:100%; padding:14px; background:linear-gradient(135deg,#c9a84c,#a07828); border:none; border-radius:12px; color:#0a0a0f; font-size:15px; font-weight:600; cursor:pointer; font-family:'Tajawal',sans-serif;">Enter Noor ✦</button>
+  <!-- FIRST VISIT: one-time name prompt -->
+  <div class="overlay" id="name-overlay">
+    <div class="overlay-box">
+      <div class="overlay-moon">☽</div>
+      <div class="overlay-title">Ramadan Mubarak</div>
+      <div class="overlay-sub">
+        What shall we call you?<br>
+        <small>We'll greet you personally on every visit — no account needed.</small>
+      </div>
+      <input class="overlay-input" id="name-input" type="text" placeholder="Your name or nickname..."
+        onkeydown="if(event.key==='Enter') saveName()">
+      <button class="overlay-btn" onclick="saveName()">Enter Noor ✦</button>
+      <button class="overlay-skip" onclick="skipName()">Skip — enter without a name</button>
+    </div>
+  </div>
+
+  <!-- ?from=Name: recipient sees who sent the link -->
+  <div class="overlay" id="from-overlay">
+    <div class="overlay-box">
+      <div class="overlay-moon">🌙</div>
+      <div class="overlay-title" id="from-title"></div>
+      <div class="overlay-sub">They wanted you to have a peaceful Ramadan.<br>Explore the bingo or find a dua for your heart.</div>
+      <button class="overlay-btn" onclick="closeFromOverlay()">Enter Noor ✦</button>
     </div>
   </div>
 
   <script>
-    // Show welcome popup if ?ref=share
-    if (window.location.search.includes('ref=share')) {
-      document.getElementById('welcome-overlay').style.display = 'flex';
-    }
-
-    // Ramadan 1447H — started 1 March 2025 WAT (UTC+1)
-    // Uses user's device time so it auto-updates per timezone
-    const RAMADAN_START = new Date('2025-03-01T00:00:00+01:00');
+    // ─── RAMADAN DATE ────────────────────────────────────────────
+    // Ramadan 1447H starts Feb 18, 2026 WAT (UTC+1)
+    const RAMADAN_START = new Date('2026-02-18T00:00:00+01:00');
 
     function getRamadanDay() {
-      const diffMs = new Date() - RAMADAN_START;
-      return Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
+      const diff = new Date() - RAMADAN_START;
+      return Math.floor(diff / 86400000) + 1;
+    }
+
+    function getRamadanPhase(day) {
+      if (day >= 1  && day <= 10) return 'The first 10 days — the days of Mercy';
+      if (day >= 11 && day <= 20) return 'The second 10 days — the days of Forgiveness';
+      if (day >= 21 && day <= 30) return 'The last 10 days — seek Laylatul Qadr 🌙';
+      if (day > 30)               return 'May Allah accept from us and from you';
+      return 'Your companion for the blessed month';
     }
 
     function updateBadge() {
       const day = getRamadanDay();
-      const badge = document.getElementById('ramadan-badge');
+      const badge   = document.getElementById('ramadan-badge');
       const tagline = document.getElementById('tagline');
-      if (day >= 1 && day <= 10) {
+      if (day >= 1 && day <= 30) {
         badge.innerHTML = `✦ Ramadan Day ${day} · 1447H ✦`;
-        tagline.textContent = 'The first 10 days — the days of Mercy';
-      } else if (day >= 11 && day <= 20) {
-        badge.innerHTML = `✦ Ramadan Day ${day} · 1447H ✦`;
-        tagline.textContent = 'The second 10 days — the days of Forgiveness';
-      } else if (day >= 21 && day <= 30) {
-        badge.innerHTML = `✦ Ramadan Day ${day} · 1447H ✦`;
-        tagline.textContent = 'The last 10 days — seek Laylatul Qadr 🌙';
       } else if (day > 30) {
         badge.innerHTML = `✦ Eid Mubarak 🌙 ✦`;
-        tagline.textContent = 'May Allah accept from us and from you';
+      }
+      tagline.textContent = getRamadanPhase(day);
+    }
+
+    // ─── GREETING ────────────────────────────────────────────────
+    function showGreeting(name) {
+      const day = getRamadanDay();
+      const el  = document.getElementById('greeting');
+      if (!name) { el.style.display = 'none'; return; }
+      const dayText = (day >= 1 && day <= 30) ? ` — Day ${day} of Ramadan` : '';
+      el.textContent = `Salam Alaykum, ${name}${dayText} 🌙`;
+      el.style.display = 'block';
+      // Fade in after a tick
+      setTimeout(() => el.classList.add('visible'), 80);
+    }
+
+    // ─── NAME PROMPT ─────────────────────────────────────────────
+    function saveName() {
+      const name = document.getElementById('name-input').value.trim();
+      if (name) localStorage.setItem('noor_name', name);
+      localStorage.setItem('noor_visited', '1');
+      document.getElementById('name-overlay').style.display = 'none';
+      showGreeting(name);
+    }
+
+    function skipName() {
+      localStorage.setItem('noor_visited', '1');
+      document.getElementById('name-overlay').style.display = 'none';
+    }
+
+    // ─── ?from= OVERLAY ──────────────────────────────────────────
+    function closeFromOverlay() {
+      document.getElementById('from-overlay').style.display = 'none';
+      // If first visit, show name prompt after a beat
+      if (!localStorage.getItem('noor_visited')) {
+        setTimeout(() => {
+          document.getElementById('name-overlay').style.display = 'flex';
+        }, 400);
       }
     }
 
+    // ─── INIT ────────────────────────────────────────────────────
     updateBadge();
+
+    const params   = new URLSearchParams(window.location.search);
+    const fromName = params.get('from');   // ?from=Bolade
+    const visited  = localStorage.getItem('noor_visited');
+    const savedName = localStorage.getItem('noor_name');
+
+    if (fromName) {
+      // Someone shared with ?from=their name
+      document.getElementById('from-title').textContent = `${decodeURIComponent(fromName)} sent you this for Ramadan 🌙`;
+      document.getElementById('from-overlay').style.display = 'flex';
+    } else if (!visited) {
+      // First time visitor — ask for name
+      document.getElementById('name-overlay').style.display = 'flex';
+    } else if (savedName) {
+      // Returning visitor — greet them
+      showGreeting(savedName);
+    }
   </script>
 </body>
 </html>

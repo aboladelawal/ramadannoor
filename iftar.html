@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iftar Countdown — Noor</title>
+  <meta property="og:title" content="Iftar Countdown 🌅 — Noor">
+  <meta property="og:description" content="Live countdown to Iftar based on your location. Ramadan 1447H.">
+  <meta property="og:image" content="https://raw.githubusercontent.com/aboladelawal/noor/main/og-noor.png">
+  <meta property="og:url" content="https://noor-seven-lac.vercel.app/iftar">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Tajawal:wght@300;400;500&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f; --gold: #c9a84c; --gold-light: #e8c97a;
+      --gold-dim: #7a6130; --cream: #f5efe0; --text: #e8dcc8; --text-dim: #8a7d6a;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: var(--bg); color: var(--text); font-family: 'Tajawal', sans-serif; min-height: 100vh; overflow-x: hidden; }
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image:
+        radial-gradient(1px 1px at 15% 20%, rgba(201,168,76,0.5) 0%, transparent 100%),
+        radial-gradient(1px 1px at 85% 10%, rgba(201,168,76,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 40% 80%, rgba(201,168,76,0.4) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70% 60%, rgba(201,168,76,0.25) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 10% 55%, rgba(201,168,76,0.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 60% 35%, rgba(201,168,76,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 80%, rgba(201,168,76,0.25) 0%, transparent 100%);
+    }
+    .page { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 24px 20px 60px; }
+    .back { display: inline-flex; align-items: center; gap: 8px; color: var(--text-dim); text-decoration: none; font-size: 13px; margin-bottom: 32px; transition: color 0.2s; }
+    .back:hover { color: var(--gold); }
+
+    /* Header */
+    .header { text-align: center; margin-bottom: 40px; }
+    .header-icon { font-size: 48px; margin-bottom: 10px; display: block; }
+    .header h1 { font-family: 'Cormorant Garamond', serif; font-size: 42px; font-weight: 300; color: var(--gold-light); line-height: 1; text-shadow: 0 0 30px rgba(201,168,76,0.3); }
+    .header p { font-size: 13px; color: var(--text-dim); margin-top: 10px; line-height: 1.6; font-weight: 300; }
+
+    /* Location state */
+    .location-prompt { text-align: center; padding: 40px 20px; }
+    .loc-icon { font-size: 44px; margin-bottom: 16px; }
+    .loc-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--gold-light); margin-bottom: 10px; }
+    .loc-sub { font-size: 13px; color: var(--text-dim); line-height: 1.7; margin-bottom: 28px; }
+    .loc-btn { padding: 14px 32px; background: linear-gradient(135deg, var(--gold), #a07828); border: none; border-radius: 12px; color: #0a0a0f; font-size: 15px; font-weight: 600; cursor: pointer; font-family: 'Tajawal', sans-serif; letter-spacing: 0.5px; }
+    .loc-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(201,168,76,0.3); transition: all 0.3s; }
+    .loc-manual { margin-top: 16px; font-size: 12px; color: var(--text-dim); }
+    .loc-manual a { color: var(--gold-dim); cursor: pointer; text-decoration: underline; }
+
+    /* Main countdown */
+    .countdown-section { display: none; }
+    .city-name { text-align: center; font-size: 13px; color: var(--gold-dim); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+
+    /* Sky gradient card */
+    .sky-card {
+      background: linear-gradient(160deg, #0d0d1a 0%, #1a0f2e 40%, #2d1810 70%, #1a0a06 100%);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 20px;
+      padding: 36px 28px;
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .sky-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.4;
+    }
+    .iftar-label { font-size: 11px; letter-spacing: 3px; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 16px; }
+    .time-display { font-family: 'Cormorant Garamond', serif; font-size: 80px; font-weight: 300; color: var(--gold-light); line-height: 1; text-shadow: 0 0 40px rgba(201,168,76,0.4); letter-spacing: 4px; }
+    .time-display.large { font-size: 56px; letter-spacing: 2px; }
+    .time-units { display: flex; justify-content: center; gap: 24px; margin-top: 8px; }
+    .time-unit { font-size: 10px; letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase; }
+    .iftar-time-actual { margin-top: 20px; font-size: 14px; color: var(--text-dim); }
+    .iftar-time-actual strong { color: var(--gold); font-weight: 500; }
+
+    /* After iftar */
+    .iftar-now { display: none; text-align: center; padding: 20px 0; }
+    .iftar-now .big-emoji { font-size: 56px; margin-bottom: 16px; display: block; }
+    .iftar-now h2 { font-family: 'Cormorant Garamond', serif; font-size: 36px; color: var(--gold-light); margin-bottom: 12px; }
+
+    /* Dua card */
+    .dua-card {
+      background: rgba(201,168,76,0.05);
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 16px;
+      padding: 28px 24px;
+      margin-bottom: 16px;
+    }
+    .dua-label { font-size: 10px; letter-spacing: 3px; color: var(--gold-dim); text-transform: uppercase; margin-bottom: 14px; }
+    .dua-arabic { font-family: 'Amiri', serif; font-size: 26px; color: var(--gold-light); text-align: right; direction: rtl; line-height: 1.8; margin-bottom: 14px; }
+    .dua-latin { font-size: 14px; color: var(--text); font-style: italic; line-height: 1.7; margin-bottom: 10px; }
+    .dua-meaning { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+    .dua-source { font-size: 11px; color: var(--gold-dim); margin-top: 12px; letter-spacing: 1px; }
+
+    /* Prayer times */
+    .prayer-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(201,168,76,0.12);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .prayer-header { padding: 16px 20px; border-bottom: 1px solid rgba(201,168,76,0.1); }
+    .prayer-header-label { font-size: 10px; letter-spacing: 3px; color: var(--gold-dim); text-transform: uppercase; }
+    .prayer-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); transition: background 0.2s; }
+    .prayer-row:last-child { border-bottom: none; }
+    .prayer-row.active { background: rgba(201,168,76,0.08); }
+    .prayer-name { font-size: 14px; color: var(--text); font-weight: 400; }
+    .prayer-row.active .prayer-name { color: var(--gold-light); font-weight: 500; }
+    .prayer-time { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--gold); }
+    .prayer-row.active .prayer-time { color: var(--gold-light); }
+    .next-badge { font-size: 9px; letter-spacing: 1px; background: rgba(201,168,76,0.15); color: var(--gold); padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
+
+    /* Suhoor reminder */
+    .suhoor-card {
+      background: linear-gradient(135deg, rgba(20,20,60,0.8), rgba(10,10,20,0.9));
+      border: 1px solid rgba(100,100,200,0.2);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .suhoor-icon { font-size: 28px; }
+    .suhoor-text { flex: 1; }
+    .suhoor-title { font-size: 14px; color: #a0a0d0; font-weight: 500; margin-bottom: 4px; }
+    .suhoor-sub { font-size: 12px; color: #606080; }
+
+    /* Location bar */
+    .location-bar { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 12px; color: var(--text-dim); }
+    .location-bar span { color: var(--gold-dim); }
+    .change-loc { color: var(--gold-dim); cursor: pointer; text-decoration: underline; font-size: 11px; }
+    .change-loc:hover { color: var(--gold); }
+
+    /* Progress bar */
+    .fast-progress { margin-bottom: 20px; }
+    .fast-progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); margin-bottom: 6px; letter-spacing: 0.5px; }
+    .fast-progress-bar { height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+    .fast-progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); border-radius: 2px; transition: width 1s linear; }
+
+    /* Error / loading */
+    .status-msg { text-align: center; padding: 40px 20px; color: var(--text-dim); font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <a href="index.html" class="back">← Back to Noor</a>
+
+    <div class="header">
+      <span class="header-icon">🌅</span>
+      <h1>Iftar Countdown</h1>
+      <p>Live countdown to sunset. Your fast tracked, your dua ready.</p>
+    </div>
+
+    <!-- Location prompt -->
+    <div id="location-prompt" class="location-prompt">
+      <div class="loc-icon">📍</div>
+      <div class="loc-title">Where are you fasting?</div>
+      <div class="loc-sub">We'll calculate your exact Iftar time.<br>Your location is never stored or shared.</div>
+      <button class="loc-btn" onclick="requestLocation()">📍 Use My Location</button>
+      <div class="loc-manual">or <a onclick="showCityInput()">enter your city manually</a></div>
+      <div id="city-input-wrap" style="display:none; margin-top:16px;">
+        <input id="city-input" type="text" placeholder="e.g. Lagos, London, Dubai..."
+          style="width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(201,168,76,0.25); border-radius:12px; padding:12px 16px; color:var(--text); font-family:'Tajawal',sans-serif; font-size:14px; outline:none; text-align:center; margin-bottom:12px;"
+          onkeydown="if(event.key==='Enter') lookupCity()">
+        <button onclick="lookupCity()" style="width:100%; padding:12px; background:linear-gradient(135deg,#c9a84c,#a07828); border:none; border-radius:12px; color:#0a0a0f; font-size:14px; font-weight:600; cursor:pointer; font-family:'Tajawal',sans-serif;">Find Iftar Time</button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading-msg" class="status-msg" style="display:none;">
+      Calculating your Iftar time...
+    </div>
+
+    <!-- Main countdown section -->
+    <div class="countdown-section" id="countdown-section">
+
+      <div class="location-bar">
+        <span>📍</span>
+        <span id="city-display">Lagos, Nigeria</span>
+        <span class="change-loc" onclick="resetLocation()">change</span>
+      </div>
+
+      <!-- Fast progress -->
+      <div class="fast-progress">
+        <div class="fast-progress-label">
+          <span>Suhoor ended</span>
+          <span id="progress-pct">0% of fast complete</span>
+        </div>
+        <div class="fast-progress-bar">
+          <div class="fast-progress-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- Sky card with countdown -->
+      <div class="sky-card">
+        <div class="iftar-label">Time Until Iftar</div>
+        <div class="time-display" id="countdown-display">--:--:--</div>
+        <div class="time-units">
+          <span class="time-unit">hours</span>
+          <span class="time-unit" style="opacity:0">·</span>
+          <span class="time-unit">minutes</span>
+          <span class="time-unit" style="opacity:0">·</span>
+          <span class="time-unit">seconds</span>
+        </div>
+        <div class="iftar-time-actual" id="iftar-time-actual">Iftar at <strong id="iftar-time-str">--:--</strong></div>
+      </div>
+
+      <!-- Iftar arrived state -->
+      <div class="iftar-now" id="iftar-now">
+        <span class="big-emoji">🌙</span>
+        <h2>Allahu Akbar — Iftar Time!</h2>
+      </div>
+
+      <!-- Iftar dua -->
+      <div class="dua-card">
+        <div class="dua-label">Dua for Breaking Fast</div>
+        <div class="dua-arabic">ذَهَبَ الظَّمَأُ وَابْتَلَّتِ الْعُرُوقُ وَثَبَتَ الأَجْرُ إِنْ شَاءَ اللَّه</div>
+        <div class="dua-latin">Dhahaba al-ẓama'u wa ibtallatil-'urūqu wa thabatal-ajru in shā'Allah</div>
+        <div class="dua-meaning">"The thirst is gone, the veins are moistened, and the reward is confirmed, if Allah wills."</div>
+        <div class="dua-source">— Sunan Abu Dawud 2357</div>
+      </div>
+
+      <!-- Prayer times -->
+      <div class="prayer-card">
+        <div class="prayer-header">
+          <div class="prayer-header-label">Today's Prayer Times</div>
+        </div>
+        <div id="prayer-times-list"></div>
+      </div>
+
+      <!-- Suhoor reminder -->
+      <div class="suhoor-card" id="suhoor-card" style="display:none;">
+        <div class="suhoor-icon">🌙</div>
+        <div class="suhoor-text">
+          <div class="suhoor-title">Suhoor ends at <span id="suhoor-time">--:--</span></div>
+          <div class="suhoor-sub" id="suhoor-sub">Set an alarm — don't miss it</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // ── Prayer time calculation (simplified, accurate within ~2 min) ──────────
+    // Uses the Diyanet/MWL algorithm
+    const DEG = Math.PI / 180;
+
+    function sunPosition(date, lat, lng) {
+      const JD = date.getTime() / 86400000 + 2440587.5;
+      const D  = JD - 2451545.0;
+      const g  = (357.529 + 0.98560028 * D) % 360;
+      const q  = (280.459 + 0.98564736 * D) % 360;
+      const L  = (q + 1.915 * Math.sin(g * DEG) + 0.020 * Math.sin(2 * g * DEG)) % 360;
+      const e  = 23.439 - 0.00000036 * D;
+      const RA = Math.atan2(Math.cos(e * DEG) * Math.sin(L * DEG), Math.cos(L * DEG)) / DEG;
+      const decl = Math.asin(Math.sin(e * DEG) * Math.sin(L * DEG)) / DEG;
+      const EqT = q - RA;
+      return { decl, EqT };
+    }
+
+    function prayerTimes(date, lat, lng, tz) {
+      const { decl, EqT } = sunPosition(date, lat, lng);
+      const noon = 12 - lng / 15 - EqT / 60 - tz;
+
+      function hourAngle(angle) {
+        const cos_h = (Math.sin(angle * DEG) - Math.sin(lat * DEG) * Math.sin(decl * DEG))
+                    / (Math.cos(lat * DEG) * Math.cos(decl * DEG));
+        if (Math.abs(cos_h) > 1) return null;
+        return Math.acos(cos_h) / DEG / 15;
+      }
+
+      const fajrHA    = hourAngle(-18);  // Fajr: -18°
+      const sunriseHA = hourAngle(-0.833);
+      const asrFactor = 1 / Math.tan((Math.abs(lat - decl) * DEG + Math.atan(1)) * DEG); // Shafi
+      // Asr: shadow = tan(alt) = 1 + shadow factor
+      const asrAlt    = Math.atan(1 / (asrFactor + Math.tan(Math.abs(lat - decl) * DEG))) / DEG;
+      const asrHA     = hourAngle(asrAlt);
+      const maghribHA = hourAngle(-0.833);
+      const ishaHA    = hourAngle(-17);  // Isha: -17°
+
+      const toTime = (decimal) => {
+        const h = Math.floor(decimal);
+        const m = Math.round((decimal - h) * 60);
+        return { h, m };
+      };
+
+      return {
+        fajr:    toTime(noon - fajrHA),
+        sunrise: toTime(noon - sunriseHA),
+        dhuhr:   toTime(noon + 0.067),
+        asr:     toTime(noon + asrHA),
+        maghrib: toTime(noon + maghribHA),  // Iftar
+        isha:    toTime(noon + ishaHA),
+      };
+    }
+
+    function fmt(t) {
+      const h12 = t.h % 12 || 12;
+      const ampm = t.h >= 12 ? 'PM' : 'AM';
+      return `${h12}:${String(t.m).padStart(2,'0')} ${ampm}`;
+    }
+
+    function timeToMinutes(t) { return t.h * 60 + t.m; }
+
+    // ── State ────────────────────────────────────────────────────
+    let userLat = null, userLng = null, userTZ = null, userCity = '';
+    let iftarMinutes = null, fajrMinutes = null;
+    let countdownInterval = null;
+
+    // ── Location ─────────────────────────────────────────────────
+    function requestLocation() {
+      document.getElementById('loading-msg').style.display = 'block';
+      document.getElementById('location-prompt').style.display = 'none';
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          userLat = pos.coords.latitude;
+          userLng = pos.coords.longitude;
+          userTZ  = -new Date().getTimezoneOffset() / 60;
+          reverseGeocode(userLat, userLng);
+        },
+        err => {
+          document.getElementById('loading-msg').style.display = 'none';
+          document.getElementById('location-prompt').style.display = 'block';
+          document.getElementById('city-input-wrap').style.display = 'block';
+          alert('Could not get location. Please enter your city.');
+        }
+      );
+    }
+
+    async function reverseGeocode(lat, lng) {
+      try {
+        const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+        const d = await r.json();
+        userCity = d.address.city || d.address.town || d.address.village || d.address.county || 'Your Location';
+        const country = d.address.country || '';
+        userCity = country ? `${userCity}, ${country}` : userCity;
+      } catch {
+        userCity = 'Your Location';
+      }
+      saveAndRender();
+    }
+
+    function showCityInput() {
+      document.getElementById('city-input-wrap').style.display = 'block';
+      document.getElementById('city-input').focus();
+    }
+
+    async function lookupCity() {
+      const city = document.getElementById('city-input').value.trim();
+      if (!city) return;
+      document.getElementById('loading-msg').style.display = 'block';
+      document.getElementById('location-prompt').style.display = 'none';
+      try {
+        const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json&limit=1`);
+        const d = await r.json();
+        if (!d.length) throw new Error('Not found');
+        userLat  = parseFloat(d[0].lat);
+        userLng  = parseFloat(d[0].lon);
+        userTZ   = -new Date().getTimezoneOffset() / 60;
+        userCity = d[0].display_name.split(',').slice(0,2).join(',').trim();
+        saveAndRender();
+      } catch {
+        document.getElementById('loading-msg').style.display = 'none';
+        document.getElementById('location-prompt').style.display = 'block';
+        document.getElementById('city-input-wrap').style.display = 'block';
+        alert('City not found. Try a different spelling.');
+      }
+    }
+
+    function saveAndRender() {
+      localStorage.setItem('noor_lat', userLat);
+      localStorage.setItem('noor_lng', userLng);
+      localStorage.setItem('noor_tz',  userTZ);
+      localStorage.setItem('noor_city', userCity);
+      document.getElementById('loading-msg').style.display = 'none';
+      renderCountdown();
+    }
+
+    function resetLocation() {
+      localStorage.removeItem('noor_lat');
+      localStorage.removeItem('noor_lng');
+      localStorage.removeItem('noor_tz');
+      localStorage.removeItem('noor_city');
+      if (countdownInterval) clearInterval(countdownInterval);
+      document.getElementById('countdown-section').style.display = 'none';
+      document.getElementById('location-prompt').style.display = 'block';
+    }
+
+    // ── Render ───────────────────────────────────────────────────
+    function renderCountdown() {
+      const today = new Date();
+      const times = prayerTimes(today, userLat, userLng, userTZ);
+
+      iftarMinutes = timeToMinutes(times.maghrib);
+      fajrMinutes  = timeToMinutes(times.fajr);
+
+      document.getElementById('city-display').textContent = userCity;
+      document.getElementById('iftar-time-str').textContent = fmt(times.maghrib);
+
+      // Prayer times list
+      const prayers = [
+        { name: 'Fajr',    t: times.fajr    },
+        { name: 'Sunrise', t: times.sunrise  },
+        { name: 'Dhuhr',   t: times.dhuhr   },
+        { name: 'Asr',     t: times.asr     },
+        { name: 'Maghrib (Iftar)', t: times.maghrib },
+        { name: 'Isha',    t: times.isha    },
+      ];
+
+      const now    = new Date();
+      const nowMin = now.getHours() * 60 + now.getMinutes();
+      // Find next prayer
+      let nextIdx = prayers.findIndex(p => timeToMinutes(p.t) > nowMin);
+      if (nextIdx === -1) nextIdx = 0;
+
+      const list = document.getElementById('prayer-times-list');
+      list.innerHTML = prayers.map((p, i) => `
+        <div class="prayer-row ${i === nextIdx ? 'active' : ''}">
+          <span class="prayer-name">${p.name}${i === nextIdx ? '<span class="next-badge">NEXT</span>' : ''}</span>
+          <span class="prayer-time">${fmt(p.t)}</span>
+        </div>
+      `).join('');
+
+      // Suhoor (tomorrow's fajr ≈ today's fajr — show as reminder before midnight)
+      if (nowMin < iftarMinutes) {
+        document.getElementById('suhoor-time').textContent = fmt(times.fajr);
+        document.getElementById('suhoor-card').style.display = 'flex';
+      }
+
+      document.getElementById('countdown-section').style.display = 'block';
+
+      if (countdownInterval) clearInterval(countdownInterval);
+      tick(times);
+      countdownInterval = setInterval(() => tick(times), 1000);
+    }
+
+    function tick(times) {
+      const now    = new Date();
+      const nowSec = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+      const iftarSec = iftarMinutes * 60;
+      const fajrSec  = fajrMinutes  * 60;
+
+      const remaining = iftarSec - nowSec;
+      const elapsed   = nowSec - fajrSec;
+      const fastDuration = iftarSec - fajrSec;
+      const pct = Math.max(0, Math.min(100, Math.round((elapsed / fastDuration) * 100)));
+
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-pct').textContent  = `${pct}% of fast complete`;
+
+      if (remaining <= 0) {
+        // Iftar time!
+        document.getElementById('countdown-display').textContent = '🌙';
+        document.getElementById('iftar-now').style.display = 'block';
+        document.getElementById('progress-fill').style.width = '100%';
+        document.getElementById('progress-pct').textContent = 'Fast complete — Allahu Akbar!';
+        clearInterval(countdownInterval);
+        return;
+      }
+
+      const h = Math.floor(remaining / 3600);
+      const m = Math.floor((remaining % 3600) / 60);
+      const s = remaining % 60;
+
+      const display = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      document.getElementById('countdown-display').textContent = display;
+    }
+
+    // ── Init ─────────────────────────────────────────────────────
+    const savedLat  = localStorage.getItem('noor_lat');
+    const savedLng  = localStorage.getItem('noor_lng');
+    const savedTZ   = localStorage.getItem('noor_tz');
+    const savedCity = localStorage.getItem('noor_city');
+
+    if (savedLat && savedLng) {
+      userLat  = parseFloat(savedLat);
+      userLng  = parseFloat(savedLng);
+      userTZ   = parseFloat(savedTZ);
+      userCity = savedCity || 'Your Location';
+      renderCountdown();
+    }
+  </script>
+</body>
+</html>
