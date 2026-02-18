@@ -281,7 +281,6 @@
       document.getElementById('error-msg').style.display = 'none';
 
       if (!navigator.geolocation) {
-        // Browser doesn't support geolocation
         document.getElementById('loading-msg').style.display = 'none';
         document.getElementById('location-prompt').style.display = 'block';
         showCityInput();
@@ -290,27 +289,33 @@
 
       navigator.geolocation.getCurrentPosition(
         async pos => {
-          document.getElementById('loading-msg').textContent = 'Fetching prayer times...';
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
+
+          // Save coords immediately — don't wait for reverse geocode
+          userCity = 'Your Location';
+          localStorage.setItem('noor_lat',  lat);
+          localStorage.setItem('noor_lng',  lng);
+          localStorage.setItem('noor_city', userCity);
+
+          // Try to get city name (best-effort, non-blocking)
           try {
             const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
             const d = await r.json();
             userCity = [d.address.city || d.address.town || d.address.village || d.address.county, d.address.country].filter(Boolean).join(', ') || 'Your Location';
-          } catch {
-            userCity = 'Your Location';
-          }
+            localStorage.setItem('noor_city', userCity);
+          } catch { /* keep "Your Location" */ }
+
+          document.getElementById('loading-msg').textContent = 'Fetching prayer times...';
           await fetchTimes(lat, lng);
         },
         (err) => {
-          // Permission denied or unavailable
           document.getElementById('loading-msg').style.display = 'none';
           document.getElementById('location-prompt').style.display = 'block';
           document.getElementById('error-msg').style.display = 'block';
           document.getElementById('error-msg').textContent = err.code === 1
-            ? 'Location permission denied. Enter your city below instead.'
-            : 'Could not get location. Enter your city below instead.';
-          showCityInput();
+            ? 'Location permission denied. Enter your city below.'
+            : 'Could not get location. Enter your city below.';
         },
         { timeout: 10000, maximumAge: 60000, enableHighAccuracy: false }
       );
@@ -322,23 +327,71 @@
     }
 
     async function lookupCity() {
-      const city = document.getElementById('city-input').value.trim();
-      if (!city) return;
+      const cityRaw = document.getElementById('city-input').value.trim();
+      if (!cityRaw) {
+        document.getElementById('city-input').focus();
+        return;
+      }
       document.getElementById('loading-msg').style.display = 'block';
+      document.getElementById('loading-msg').textContent = 'Finding your city...';
       document.getElementById('location-prompt').style.display = 'none';
+      document.getElementById('error-msg').style.display = 'none';
+
       try {
-        const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json&limit=1`);
+        // Use Aladhan's city endpoint directly — no geocoding needed
+        const today = new Date();
+        const dd   = String(today.getDate()).padStart(2,'0');
+        const mm   = String(today.getMonth()+1).padStart(2,'0');
+        const yyyy = today.getFullYear();
+
+        // Split city/country if user typed "Lagos, Nigeria" or just "Lagos"
+        const parts   = cityRaw.split(',').map(s => s.trim());
+        const city    = parts[0];
+        const country = parts[1] || '';
+
+        let url = `https://api.aladhan.com/v1/timingsByCity/${dd}-${mm}-${yyyy}?city=${encodeURIComponent(city)}&method=3`;
+        if (country) url += `&country=${encodeURIComponent(country)}`;
+
+        const r = await fetch(url);
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
         const d = await r.json();
-        if (!d.length) throw new Error('Not found');
-        const lat = parseFloat(d[0].lat);
-        const lng = parseFloat(d[0].lon);
-        userCity = d[0].display_name.split(',').slice(0,2).join(',').trim();
-        await fetchTimes(lat, lng);
-      } catch {
+        if (d.status !== 'OK' && d.code !== 200) throw new Error('City not found');
+
+        const t = d.data.timings;
+        prayerData = {
+          fajr:    t.Fajr,
+          sunrise: t.Sunrise,
+          dhuhr:   t.Dhuhr,
+          asr:     t.Asr,
+          maghrib: t.Maghrib,
+          isha:    t.Isha,
+        };
+
+        // Use meta from response for lat/lng if available, otherwise store city name as key
+        const meta = d.data.meta;
+        const lat  = meta?.latitude  || 0;
+        const lng  = meta?.longitude || 0;
+        userCity   = cityRaw;
+
+        // Save to localStorage
+        localStorage.setItem('noor_lat',  lat);
+        localStorage.setItem('noor_lng',  lng);
+        localStorage.setItem('noor_city', userCity);
+        localStorage.setItem('noor_prayer_cache', JSON.stringify({
+          date: `${dd}-${mm}-${yyyy}`,
+          timings: prayerData
+        }));
+
+        document.getElementById('loading-msg').style.display = 'none';
+        document.getElementById('error-msg').style.display   = 'none';
+        renderMain();
+
+      } catch(e) {
+        console.error('lookupCity error:', e);
         document.getElementById('loading-msg').style.display = 'none';
         document.getElementById('location-prompt').style.display = 'block';
-        document.getElementById('city-input-wrap').style.display = 'block';
-        alert('City not found — try a different spelling.');
+        document.getElementById('error-msg').style.display = 'block';
+        document.getElementById('error-msg').textContent = `City not found. Try "Lagos, Nigeria" or "London, UK".`;
       }
     }
 
