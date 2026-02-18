@@ -196,7 +196,10 @@
 
     <!-- 30-day calendar -->
     <div class="calendar-section">
-      <div class="calendar-label">Your Ramadan So Far</div>
+      <div class="calendar-label" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>Your Ramadan So Far</span>
+        <span onclick="clearTodayDeeds()" style="font-size:10px;color:var(--gold-dim);cursor:pointer;text-decoration:underline;letter-spacing:0;">reset today</span>
+      </div>
       <div class="calendar-strip" id="calendar-strip"></div>
     </div>
   </div>
@@ -209,7 +212,7 @@
     }
     const TODAY_KEY = () => {
       const d = new Date();
-      return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     };
 
     // ── Deed definitions ─────────────────────────────────────────
@@ -277,7 +280,7 @@
       for (let i = 0; i < 30; i++) {
         const d   = new Date(RAMADAN_START);
         d.setDate(d.getDate() + i);
-        const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         const raw = localStorage.getItem('noor_deeds_' + key);
         days[i+1] = raw ? Object.keys(JSON.parse(raw)).length : 0;
       }
@@ -289,7 +292,7 @@
       for (let i = today; i >= 1; i--) {
         const d   = new Date(RAMADAN_START);
         d.setDate(d.getDate() + i - 1);
-        const key = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
         const raw = localStorage.getItem('noor_deeds_' + key);
         if (raw && Object.keys(JSON.parse(raw)).length > 0) streak++;
         else break;
@@ -473,7 +476,26 @@
       if (todayEl) todayEl.scrollIntoView({ inline: 'center', behavior: 'smooth' });
     }
 
+    function clearTodayDeeds() {
+      if (!confirm('Reset today\'s deeds?')) return;
+      localStorage.removeItem('noor_deeds_' + TODAY_KEY());
+      done = {};
+      prevStars = 0;
+      document.getElementById('completion-msg').classList.remove('show');
+      renderDeeds();
+      updateScore(null);
+      renderCalendar();
+    }
+
     // ── Init ──────────────────────────────────────────────────────
+    // Clean up any stale old-format keys (unpadded month/day format from before)
+    const oldKey = (() => { const d = new Date(); return `noor_deeds_${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; })();
+    if (localStorage.getItem(oldKey)) {
+      // Migrate: copy to new key, remove old
+      const migrated = localStorage.getItem(oldKey);
+      localStorage.setItem('noor_deeds_' + TODAY_KEY(), migrated);
+      localStorage.removeItem(oldKey);
+    }
     const savedName = localStorage.getItem('noor_name');
     if (savedName) {
       document.getElementById('deeds-greeting').textContent = `Keep going, ${savedName} — Allah sees every deed 🌙`;
