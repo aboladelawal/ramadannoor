@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#0a0a0f">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Noor">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/icons/icon-120.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+  <link rel="shortcut icon" href="/icons/favicon.ico">
   <!-- Google Analytics GA4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZZG5K1EVSV"></script>
   <script>
@@ -279,6 +291,75 @@
     } else if (savedName) {
       // Returning visitor — greet them
       showGreeting(savedName);
+    }
+  </script>
+
+  <script>
+    // ── Service Worker Registration ───────────────────────────
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('Noor SW registered'))
+          .catch(err => console.log('SW error:', err));
+      });
+    }
+
+    // ── iOS Install Banner ────────────────────────────────────
+    function isIos() {
+      return /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+    }
+    function isInStandaloneMode() {
+      return ('standalone' in navigator) && navigator.standalone;
+    }
+    function showIosBanner() {
+      if (isIos() && !isInStandaloneMode() && !localStorage.getItem('noor_ios_banner_dismissed')) {
+        const banner = document.createElement('div');
+        banner.id = 'ios-install-banner';
+        banner.innerHTML = `
+          <div style="position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#1a1408;border-top:1px solid rgba(201,168,76,0.3);padding:16px 20px;display:flex;align-items:center;gap:14px;font-family:'Tajawal',sans-serif;">
+            <img src="/icons/apple-touch-icon.png" style="width:48px;height:48px;border-radius:12px;flex-shrink:0;">
+            <div style="flex:1;">
+              <div style="color:#e8c97a;font-size:14px;font-weight:600;margin-bottom:2px;">Add Noor to Home Screen</div>
+              <div style="color:#8a7d6a;font-size:12px;line-height:1.4;">Tap <strong style="color:#c9a84c;">Share</strong> then <strong style="color:#c9a84c;">"Add to Home Screen"</strong> for the best experience 🌙</div>
+            </div>
+            <button onclick="document.getElementById('ios-install-banner').remove(); localStorage.setItem('noor_ios_banner_dismissed','1')" style="background:none;border:none;color:#7a6130;font-size:22px;cursor:pointer;padding:4px;flex-shrink:0;">✕</button>
+          </div>`;
+        document.body.appendChild(banner);
+      }
+    }
+    window.addEventListener('load', showIosBanner);
+
+    // ── Android Install Prompt ────────────────────────────────
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (!localStorage.getItem('noor_android_installed')) {
+        const banner = document.createElement('div');
+        banner.id = 'android-install-banner';
+        banner.innerHTML = `
+          <div style="position:fixed;bottom:0;left:0;right:0;z-index:9999;background:#1a1408;border-top:1px solid rgba(201,168,76,0.3);padding:16px 20px;display:flex;align-items:center;gap:14px;font-family:'Tajawal',sans-serif;">
+            <img src="/icons/apple-touch-icon.png" style="width:48px;height:48px;border-radius:12px;flex-shrink:0;">
+            <div style="flex:1;">
+              <div style="color:#e8c97a;font-size:14px;font-weight:600;margin-bottom:2px;">Install Noor</div>
+              <div style="color:#8a7d6a;font-size:12px;">Add to your home screen for quick access 🌙</div>
+            </div>
+            <button onclick="installApp()" style="background:linear-gradient(135deg,#c9a84c,#a07828);border:none;border-radius:10px;color:#0a0a0f;font-size:13px;font-weight:700;padding:10px 16px;cursor:pointer;flex-shrink:0;font-family:'Tajawal',sans-serif;">Install</button>
+            <button onclick="document.getElementById('android-install-banner').remove()" style="background:none;border:none;color:#7a6130;font-size:22px;cursor:pointer;padding:4px;flex-shrink:0;">✕</button>
+          </div>`;
+        document.body.appendChild(banner);
+      }
+    });
+
+    async function installApp() {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        localStorage.setItem('noor_android_installed', '1');
+        document.getElementById('android-install-banner')?.remove();
+      }
+      deferredPrompt = null;
     }
   </script>
 </body>
