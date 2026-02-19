@@ -274,6 +274,13 @@
     // ─── INIT ────────────────────────────────────────────────────
     updateBadge();
 
+    // Version check — if app version changed, reset visited flag
+    const APP_VERSION = 'noor-v3';
+    if (localStorage.getItem('noor_app_version') !== APP_VERSION) {
+      localStorage.removeItem('noor_visited');
+      localStorage.setItem('noor_app_version', APP_VERSION);
+    }
+
     const params   = new URLSearchParams(window.location.search);
     const fromName = params.get('from');   // ?from=Bolade
     const visited  = localStorage.getItem('noor_visited');
@@ -293,13 +300,10 @@
   </script>
 
   <script>
-    // ── Service Worker Registration ───────────────────────────
+    // ── Service Worker ────────────────────────────────────────
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(reg => console.log('Noor SW registered'))
-          .catch(err => console.log('SW error:', err));
-      });
+      // Register sw.js — it handles its own cache busting via version
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
     }
 
     // ── iOS Install Banner ────────────────────────────────────
@@ -310,7 +314,7 @@
       return ('standalone' in navigator) && navigator.standalone;
     }
     function showIosBanner() {
-      if (isIos() && !isInStandaloneMode() && !localStorage.getItem('noor_ios_banner_dismissed')) {
+      if (isIos() && !isInStandaloneMode()) {
         const banner = document.createElement('div');
         banner.id = 'ios-install-banner';
         banner.innerHTML = `
@@ -318,9 +322,9 @@
             <img src="/icons/icon-512.png" style="width:48px;height:48px;border-radius:12px;flex-shrink:0;">
             <div style="flex:1;">
               <div style="color:#e8c97a;font-size:14px;font-weight:600;margin-bottom:2px;">Add Noor to Home Screen</div>
-              <div style="color:#8a7d6a;font-size:12px;line-height:1.4;">Tap <strong style="color:#c9a84c;">Share</strong> then <strong style="color:#c9a84c;">"Add to Home Screen"</strong> for the best experience 🌙</div>
+              <div style="color:#8a7d6a;font-size:12px;line-height:1.4;">Tap <strong style="color:#c9a84c;">Share ⬆</strong> then <strong style="color:#c9a84c;">"Add to Home Screen"</strong> 🌙</div>
             </div>
-            <button onclick="document.getElementById('ios-install-banner').remove(); localStorage.setItem('noor_ios_banner_dismissed','1')" style="background:none;border:none;color:#7a6130;font-size:22px;cursor:pointer;padding:4px;flex-shrink:0;">✕</button>
+            <button onclick="document.getElementById('ios-install-banner').remove()" style="background:none;border:none;color:#7a6130;font-size:22px;cursor:pointer;padding:4px;flex-shrink:0;">✕</button>
           </div>`;
         document.body.appendChild(banner);
       }
