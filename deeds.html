@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Google Analytics GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZZG5K1EVSV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-ZZG5K1EVSV", {page_title: 'Good Deeds'});
+  </script>
+  <!-- Vercel Analytics -->
+  <script defer src="/_vercel/insights/script.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Good Deeds — Noor</title>
@@ -487,6 +497,7 @@
         updateScore(null); // unchecking — no affirmation
       } else {
         done[id] = true;
+        gtag('event', 'deed_checked', { event_category: 'engagement', event_label: id });
         el.classList.add('done');
         saveTodayDeeds(done);
         updateScore(id); // checking — show affirmation

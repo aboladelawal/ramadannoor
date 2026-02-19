@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Google Analytics GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZZG5K1EVSV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag("js", new Date());
+    gtag("config", "G-ZZG5K1EVSV", {page_title: 'Iftar Countdown'});
+  </script>
+  <!-- Vercel Analytics -->
+  <script defer src="/_vercel/insights/script.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Suhoor & Iftar — Noor</title>
@@ -394,6 +404,7 @@
     function renderMain() {
       document.getElementById('city-display').textContent = userCity || 'Your Location';
       document.getElementById('main-section').style.display = 'block';
+      gtag('event', 'iftar_loaded', { event_category: 'engagement', event_label: userCity });
 
       // Time pills
       document.getElementById('suhoor-time-display').textContent = fmt12(prayerData.fajr);
