@@ -1,18 +1,16 @@
-const CACHE_NAME = 'noor-v1';
+const CACHE_NAME = 'noor-v3';
 const URLS_TO_CACHE = [
-  '/',
-  '/index.html',
   '/dua.html',
   '/bingo.html',
   '/deeds.html',
   '/iftar.html',
-  '/icons/icon-192.png',
   '/icons/icon-512.png',
-  '/icons/apple-touch-icon.png',
   '/manifest.json'
 ];
+// Always fetch fresh — never cache
+const NEVER_CACHE = ['/', '/index.html', '/sw.js'];
 
-// ── Install: cache all core files ─────────────────────────────
+// ── Install ───────────────────────────────────────────────────
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(URLS_TO_CACHE))
@@ -30,20 +28,26 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// ── Fetch: serve from cache, fallback to network ──────────────
+// ── Fetch ─────────────────────────────────────────────────────
 self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+
+  // Never cache index.html — always go to network
+  if (NEVER_CACHE.some(p => url.pathname === p)) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then(cached => {
       if (cached) return cached;
       return fetch(event.request).then(response => {
-        // Cache new successful GET requests
         if (event.request.method === 'GET' && response.status === 200) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
         }
         return response;
       }).catch(() => {
-        // Offline fallback
         if (event.request.destination === 'document') {
           return caches.match('/index.html');
         }
@@ -58,13 +62,11 @@ self.addEventListener('push', event => {
   const title = data.title || 'Noor 🌙';
   const options = {
     body: data.body || 'Your Ramadan companion is here.',
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-76.png',
+    icon: '/icons/icon-512.png',
+    badge: '/icons/icon-512.png',
     vibrate: [200, 100, 200],
     data: { url: data.url || '/' },
-    actions: [
-      { action: 'open', title: 'Open Noor' }
-    ]
+    actions: [{ action: 'open', title: 'Open Noor' }]
   };
   event.waitUntil(self.registration.showNotification(title, options));
 });
